@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 import pytz
 import json
 import logging
-from constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
+from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
                                                 WORLDCLIM_TITLE, DESCRIPTION,
                                                 WORLDCLIM_PROVIDER, LICENSE,
                                                 LICENSE_LINK)
@@ -71,7 +71,7 @@ def create_item(metadata: dict,
         "metadata",
         pystac.Asset(
             href=metadata_url,
-            media_type=pystac.MediaType.JSON,
+            media_type=pystac.MediaType.JSON, 
             roles=["metadata"],
             title="WorldClim version 2.1 metadata",
         ),
