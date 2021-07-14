@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 import pytz
 import json
 import logging
-from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
+from constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
                                                 WORLDCLIM_TITLE, DESCRIPTION,
                                                 WORLDCLIM_PROVIDER, LICENSE,
                                                 LICENSE_LINK)
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def create_item(metadata: dict,
                 metadata_url: str,
                 cog_href: str = None) -> pystac.Item:
-    """Creates a STAC item for a Natural Resources Canada Land Cover dataset.
+    """Creates a STAC item for a WorldClim dataset.
 
     Args:
         metadata_url (str): Path to provider metadata.
@@ -34,15 +34,15 @@ def create_item(metadata: dict,
     utc = pytz.utc
 
     year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(year, "%Y"))
+    dataset_datetime = utc.localize(datetime.strptime(year, "%Y")) #not sure
 
-    end_datetime = dataset_datetime + relativedelta(years=5)
+    end_datetime = dataset_datetime + relativedelta(years=5) #can use months?
 
     start_datetime = dataset_datetime
     end_datetime = end_datetime
 
     id = title.replace(" ", "-")
-    geometry = json.loads(constants.get("geojson_geom").get("@value"))
+    geometry = json.loads(constants.get("geojson_geom").get("@value")) #files are in tif format
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
     properties = {
         "title": title,
@@ -93,27 +93,27 @@ def create_item(metadata: dict,
 
 
 def create_collection(metadata: dict):
-    # Creates a STAC collection for a Natural Resources Canada Land Cover dataset
+    # Creates a STAC collection for a WorldClim dataset
 
     title = metadata.get("tiff_metadata").get("dct:title")
 
     utc = pytz.utc
     year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(year, "%Y"))
+    dataset_datetime = utc.localize(datetime.strptime(year, "%Y")) #need this to be month
 
-    end_datetime = dataset_datetime + relativedelta(years=5)
+    end_datetime = dataset_datetime + relativedelta(years=5) #months 01-12
 
     start_datetime = dataset_datetime
     end_datetime = end_datetime
 
-    geometry = json.loads(metadata.get("geojson_geom").get("@value"))
+    geometry = json.loads(metadata.get("geojson_geom").get("@value")) #
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
 
     collection = pystac.Collection(
-        id=LANDCOVER_ID,
-        title=LANDCOVER_TITLE,
+        id=WORLDCLIM_ID,
+        title=WORLDCLIM_TITLE,
         description=DESCRIPTION,
-        providers=[NRCAN_PROVIDER],
+        providers=[WORLDCLIM_PROVIDER],
         license=LICENSE,
         extent=pystac.Extent(
             pystac.SpatialExtent(bbox),

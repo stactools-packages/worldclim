@@ -28,8 +28,7 @@ def create_worldclim_command(cli):
     @click.argument("destination")
    
    def create_catalog_command(destination: str, source: str):
-        """Creates a STAC Catalog from Natural Resources Canada
-        Land Cover metadata files.
+        """Creates a STAC Catalog from WorldClim constants file
 
         Args:
             destination (str): Path to output STAC catalog.
@@ -49,7 +48,7 @@ def create_worldclim_command(cli):
             i for i in os.listdir(asset_package_path) if i.endswith(".tif")
         ][0])
 
-        output_path = destination.replace(".json", "_cog.tif")
+        output_path = destination.replace(".tif", "_cog.tif")
 
         # Create cog asset
         cog_path = cog.create_cog(tif_path, output_path, dry_run=False)
