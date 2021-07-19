@@ -1,5 +1,5 @@
 from datetime import datetime
-from stactools_aster.stactools.aster import constants
+from stactools.worldclim import constants
 from dateutil.relativedelta import relativedelta
 import pytz
 import json
