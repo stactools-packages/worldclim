@@ -26,8 +26,7 @@ def create_worldclim_command(cli):
         short_help="Create a STAC catalog for WorldClim version 2.1 dataset.",
     )
     @click.argument("destination")
-   
-   def create_catalog_command(destination: str, source: str):
+    def create_catalog_command(destination: str, source: str):
         """Creates a STAC Catalog from WorldClim constants file
 
         Args:
