@@ -9,7 +9,7 @@ WORLDCLIM_ID = "world-clim"
 WORLDCLIM_EPSG = 4326 #to find  from a tiff file: gdalinfo file_path
 WORLDCLIM_CRS = CRS.from_epsg(WORLDCLIM_EPSG)
 WORLDCLIM_TITLE = "Historical climate data"
-LICENSE = "OCLC-2.0" #if not propprietary use license link for more info
+LICENSE = "CC-BY-SA-4.0" #if not propprietary use license link for more info
 LICENSE_LINK = Link(
 )
 
