@@ -1,14 +1,15 @@
 from datetime import datetime
 #from stactools_aster.stactools.aster import constants
+from stactools.worldclim import constants
 from dateutil.relativedelta import relativedelta
 import pytz
 import json
 import logging
 from stactools.worldclim import constants
 from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
-                                                WORLDCLIM_TITLE, DESCRIPTION,
-                                                WORLDCLIM_PROVIDER, LICENSE,
-                                                LICENSE_LINK)
+                                           WORLDCLIM_TITLE, DESCRIPTION,
+                                           WORLDCLIM_PROVIDER, LICENSE,
+                                           LICENSE_LINK)
 
 import pystac
 from shapely.geometry import Polygon
@@ -29,21 +30,23 @@ def create_item(metadata: dict,
         pystac.Item: STAC Item object.
     """
 
-    title = constants.get("tiff_metadata").get("dct:title") #reference constants page constants.get 
+    title = constants.get("tiff_metadata").get(
+        "dct:title")  # reference constants page constants.get
     description = constants.get("description_metadata").get("dct:description")
 
     utc = pytz.utc
 
     year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(year, "%Y")) #not sure
+    dataset_datetime = utc.localize(datetime.strptime(year, "%Y"))  # not sure
 
-    end_datetime = dataset_datetime + relativedelta(years=5) #can use months?
+    end_datetime = dataset_datetime + relativedelta(years=5)  # can use months?
 
     start_datetime = dataset_datetime
     end_datetime = end_datetime
 
     id = title.replace(" ", "-")
-    geometry = json.loads(constants.get("geojson_geom").get("@value")) #files are in tif format
+    geometry = json.loads(
+        constants.get("geojson_geom").get("@value"))  # files are in tif format
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
     properties = {
         "title": title,
@@ -72,7 +75,7 @@ def create_item(metadata: dict,
         "metadata",
         pystac.Asset(
             href=metadata_url,
-            media_type=pystac.MediaType.JSON, 
+            media_type=pystac.MediaType.JSON,
             roles=["metadata"],
             title="WorldClim version 2.1 metadata",
         ),
@@ -100,14 +103,15 @@ def create_collection(metadata: dict):
 
     utc = pytz.utc
     year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(year, "%Y")) #need this to be month
+    dataset_datetime = utc.localize(datetime.strptime(
+        year, "%Y"))  # need this to be month
 
-    end_datetime = dataset_datetime + relativedelta(years=5) #months 01-12
+    end_datetime = dataset_datetime + relativedelta(years=5)  # months 01-12
 
     start_datetime = dataset_datetime
     end_datetime = end_datetime
 
-    geometry = json.loads(metadata.get("geojson_geom").get("@value")) #
+    geometry = json.loads(metadata.get("geojson_geom").get("@value"))
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
 
     collection = pystac.Collection(

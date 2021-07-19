@@ -15,7 +15,7 @@ def create_worldclim_command(cli):
     @cli.group(
         "worldclim",
         short_help=(
-            "Commands for working with WorldClim Historical Climate data" #change
+            "Commands for working with WorldClim Historical Climate data"  # change
         ),
     )
     def worldclim():
@@ -41,6 +41,8 @@ def create_worldclim_command(cli):
         json_path = source
 
         metadata = constants.get_metadata(json_path) 
+        metadata = constants.get_metadata(
+            json_path)  # reference constants instead of utils
 
         asset_package_path = constants.download_asset_package(metadata)
 
@@ -55,7 +57,7 @@ def create_worldclim_command(cli):
 
         # Create stac item
         item = stac.create_item(metadata, json_path, cog_path, destination)
-        item.collection_id = WORLDCLIM_ID 
+        item.collection_id = WORLDCLIM_ID
 
         collection = stac.create_collection(metadata)
         collection.add_item(item)
