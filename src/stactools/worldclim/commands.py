@@ -27,12 +27,12 @@ def create_worldclim_command(cli):
     )
     @click.argument("destination")
    
-   def create_catalog_command(destination: str, source: str):
+    def create_catalog_command(destination: str, source: str):
         """Creates a STAC Catalog from WorldClim constants file
 
         Args:
             destination (str): Path to output STAC catalog.
-            source (str): Path to NRCan provided metadata - Currently only supports JSON-LD.
+            source (str): Path to NRCan provided metadata - Currently only supports JSON-LD. #dont have this for worldclim, source=constants
 
         Returns:
             Callable
@@ -40,7 +40,7 @@ def create_worldclim_command(cli):
 
         json_path = source
 
-        metadata = constants.get_metadata(json_path) #reference constants instead of utils
+        metadata = constants.get_metadata(json_path) 
 
         asset_package_path = constants.download_asset_package(metadata)
 
