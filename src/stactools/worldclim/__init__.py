@@ -10,5 +10,8 @@ def register_plugin(registry):
     from stactools.worldclim import commands
     registry.register_subcommand(commands.create_worldclim_command)
 
+
+__all__ = [create_cog, create_item]
+
 __version__ = '0.1.5'
 """Library version"""
