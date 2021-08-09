@@ -43,9 +43,9 @@ setup(
     ],
     include_package_data=False,
     install_requires=install_requires,
-    license="Apache Software License 2.0",
+    license="Creative Commons - Attribution-ShareAlike 4.0 International - CC BY-SA 4.0",
     keywords=[
-        'stactools', 'psytac', 'nrcan', 'landcover', 'raster',
+        'stactools', 'psytac', 'climate', 'worldclim', 'raster',
         'catalog', 'STAC'
     ])
 
