@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-from stactools_aster.stactools.aster import constants
+from stactools.worldclim import constants #stactools_aster.stactools.aster
 from stactools.worldclim import constants
 from dateutil.relativedelta import relativedelta
 import pytz
@@ -19,8 +19,8 @@ from shapely.geometry import Polygon
 logger = logging.getLogger(__name__)
 
 
-def create_item(metadata: dict,
-                metadata_url: str,
+def create_item(file: str,
+                file_url: str,
                 cog_href: str = None) -> pystac.Item:
     """Creates a STAC item for a WorldClim dataset.
 
@@ -37,9 +37,11 @@ def create_item(metadata: dict,
     description = constants.get("description_metadata").get("dct:description")
 
     # example filename = "wc2.1_10m_01.tif"
-    filename = 'wc2.1_10m_01.tif' #want to make this more generic 
+    # filename = 'wc2.1_10m_01.tif' #want to make this more generic - ETL component?
+    climate_mode = [file.spilt('_')[0]]
+    gsd = [file.spilt('_')[1]]
     utc = pytz.utc
-    month = os.path.splitext(filename)[0].split("_")[-1] # extracts the string after the last underscore and before the last period
+    month = os.path.splitext(file)[0].split("_")[-1] # extracts the string after the last underscore and before the last period
     start_year = "1970"
     end_year = "2000"
 
@@ -51,7 +53,8 @@ def create_item(metadata: dict,
     end_datetime = utc.localize(datetime.strptime(end_datestring, "%m_%Y"))
     print(end_datetime)
 
-    gsd = os.path.splitext(filename)[0].split("_")[-2] 
+#highest resolution = 30s ~ 1m^2
+    gsd = os.path.splitext(file)[0].split("_")[-2] 
     print(gsd)
     gsd = float(gsd) #convert string to number
 
@@ -85,9 +88,9 @@ def create_item(metadata: dict,
 
     # Create metadata asset
     item.add_asset(
-        "metadata",
+        "metadata", #check asset needs: no metadata file
         pystac.Asset(
-            href=metadata_url,
+            href=file_url,
             media_type=pystac.MediaType.JSON, 
             roles=["metadata"],
             title="WorldClim version 2.1 metadata",
@@ -109,7 +112,7 @@ def create_item(metadata: dict,
     return item
 
 
-def create_collection(metadata: dict): #might need to change this to match code above
+def create_collection(metadata: dict): 
     # Creates a STAC collection for a WorldClim dataset
 
     title = metadata.get("tiff_metadata").get("dct:title")
