@@ -1,10 +1,12 @@
 from datetime import datetime
+import os
 from stactools_aster.stactools.aster import constants
 from stactools.worldclim import constants
 from dateutil.relativedelta import relativedelta
 import pytz
 import json
 import logging
+import rasterio
 from stactools.worldclim import constants
 from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
                                            WORLDCLIM_TITLE, DESCRIPTION,
@@ -31,26 +33,37 @@ def create_item(metadata: dict,
     """
 
     title = constants.get("tiff_metadata").get(
-        "dct:title")  # reference constants page constants.get
+        "dct:title")  
     description = constants.get("description_metadata").get("dct:description")
 
+    # example filename = "wc2.1_10m_01.tif"
+    filename = 'wc2.1_10m_01.tif' #want to make this more generic 
     utc = pytz.utc
+    month = os.path.splitext(filename)[0].split("_")[-1] # extracts the string after the last underscore and before the last period
+    start_year = "1970"
+    end_year = "2000"
 
-    year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(year, "%Y"))  # not sure
+    start_datestring = f"{month}_{start_year}"
+    start_datetime = utc.localize(datetime.strptime(start_datestring, "%m_%Y"))
+    print(start_datetime)
 
-    end_datetime = dataset_datetime + relativedelta(years=5)  # can use months?
+    end_datestring = f"{int(month) + 1}_{end_year}"
+    end_datetime = utc.localize(datetime.strptime(end_datestring, "%m_%Y"))
+    print(end_datetime)
 
-    start_datetime = dataset_datetime
-    end_datetime = end_datetime
+    gsd = os.path.splitext(filename)[0].split("_")[-2] 
+    print(gsd)
+    gsd = float(gsd) #convert string to number
 
+#use rasterio
+    dataset_worldclim = rasterio.open(title)
     id = title.replace(" ", "-")
-    geometry = json.loads(
-        constants.get("geojson_geom").get("@value"))  # files are in tif format
-    bbox = Polygon(geometry.get("coordinates")[0]).bounds
+    #geometry = longitude/latitude
+    geometry = dataset_worldclim.crs #get geometry based on ESPG
+    bbox = dataset_worldclim.bounds #get bounding box with rastero.bounds
     properties = {
         "title": title,
-        "description": description,
+        "description": description
     }
 
     # Create item
@@ -58,7 +71,7 @@ def create_item(metadata: dict,
         id=id,
         geometry=geometry,
         bbox=bbox,
-        datetime=dataset_datetime,
+        datetime=start_datetime,
         properties=properties,
         stac_extensions=[],
     )
@@ -75,7 +88,7 @@ def create_item(metadata: dict,
         "metadata",
         pystac.Asset(
             href=metadata_url,
-            media_type=pystac.MediaType.JSON,
+            media_type=pystac.MediaType.JSON, 
             roles=["metadata"],
             title="WorldClim version 2.1 metadata",
         ),
@@ -96,7 +109,7 @@ def create_item(metadata: dict,
     return item
 
 
-def create_collection(metadata: dict):
+def create_collection(metadata: dict): #might need to change this to match code above
     # Creates a STAC collection for a WorldClim dataset
 
     title = metadata.get("tiff_metadata").get("dct:title")
@@ -104,14 +117,14 @@ def create_collection(metadata: dict):
     utc = pytz.utc
     year = title.split(" ")[0]
     dataset_datetime = utc.localize(datetime.strptime(
-        year, "%Y"))  # need this to be month
+        year, "%m_%Y"))  # need this to be month_yr
 
-    end_datetime = dataset_datetime + relativedelta(years=5)  # months 01-12
+    end_datetime = dataset_datetime + relativedelta(years=30)  # months 01-12
 
     start_datetime = dataset_datetime
     end_datetime = end_datetime
 
-    geometry = json.loads(metadata.get("geojson_geom").get("@value"))
+    geometry = json.loads(metadata.get("geojson_geom").get("@value")) #should this be changed or is it creating the json?
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
 
     collection = pystac.Collection(
