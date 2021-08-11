@@ -26,7 +26,6 @@ def create_worldclim_command(cli):
         short_help="Create a STAC catalog for WorldClim version 2.1 dataset.",
     )
     @click.argument("destination")
-   
     def create_catalog_command(destination: str, source: str):
         """Creates a STAC Catalog from WorldClim constants file
 
@@ -40,7 +39,7 @@ def create_worldclim_command(cli):
 
         json_path = source
 
-        metadata = constants.get_metadata(json_path) 
+        metadata = constants.get_metadata(json_path)
         metadata = constants.get_metadata(
             json_path)  # reference constants instead of utils
 
