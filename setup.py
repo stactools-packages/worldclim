@@ -11,7 +11,7 @@ description = ("Subpackage for working with worldclim data in stactools, "
 __version__ = load_source(
     f"stactools.worldclim.version",
     os.path.join(os.path.dirname(__file__),
-                 f"stactools/worldclim/version.py"),
+                 f"src/stactools/worldclim/version.py"),
 ).__version__
 
 here = os.path.abspath(os.path.dirname(__file__))

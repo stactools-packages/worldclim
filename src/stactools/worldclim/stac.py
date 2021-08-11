@@ -11,7 +11,7 @@ from stactools.worldclim import constants
 from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
                                            WORLDCLIM_TITLE, DESCRIPTION,
                                            WORLDCLIM_PROVIDER, LICENSE,
-                                           LICENSE_LINK)
+                                           LICENSE_LINK, INSTRUMENT)
 
 import pystac
 from shapely.geometry import Polygon
@@ -35,9 +35,9 @@ def create_item(file: str,
     title = constants.get("tiff_metadata").get(
         "dct:title")  
     description = constants.get("description_metadata").get("dct:description")
+    instrument = constants.get("instrument_metadata").get("dct:instrument")
 
     # example filename = "wc2.1_10m_01.tif"
-    # filename = 'wc2.1_10m_01.tif' #want to make this more generic - ETL component?
     climate_mode = [file.spilt('_')[0]]
     gsd = [file.spilt('_')[1]]
     utc = pytz.utc
@@ -52,11 +52,6 @@ def create_item(file: str,
     end_datestring = f"{int(month) + 1}_{end_year}"
     end_datetime = utc.localize(datetime.strptime(end_datestring, "%m_%Y"))
     print(end_datetime)
-
-#highest resolution = 30s ~ 1m^2
-    gsd = os.path.splitext(file)[0].split("_")[-2] 
-    print(gsd)
-    gsd = float(gsd) #convert string to number
 
 #use rasterio
     dataset_worldclim = rasterio.open(title)
