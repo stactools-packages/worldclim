@@ -13,4 +13,4 @@ def register_plugin(registry):
 
 __all__ = [create_cog, create_item]
 
-
+__version__ = '0.1.0'
