@@ -36,9 +36,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     climate_mode = [file.spilt('_')[0]]
     gsd = [file.spilt('_')[1]]
     utc = pytz.utc
-    month = os.path.splitext(file)[0].split(
-        "_"
-    )[-1]  # extracts the string after the last underscore and before the last period
+    month = os.path.splitext(file)[0].split("_")[-1]  # extracts the string after the last underscore and before the last period
     start_year = "1970"
     end_year = "2000"
 
