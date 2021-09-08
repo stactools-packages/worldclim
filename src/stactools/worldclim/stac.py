@@ -9,7 +9,7 @@ from stactools.worldclim import constants
 from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
                                            WORLDCLIM_TITLE, DESCRIPTION,
                                            WORLDCLIM_PROVIDER, LICENSE,
-                                           LICENSE_LINK)
+                                           LICENSE_LINK, INSTRUMENT)
 
 import pystac
 from shapely.geometry import Polygon
@@ -28,9 +28,9 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         pystac.Item: STAC Item object.
     """
 
-    title = constants.get("tiff_metadata").get("dct:title")
-    description = constants.get("description_metadata").get("dct:description")
-    instrument = constants.get("instrument_metadata").get("dct:instrument")
+    title = constants.WORLDCLIM_TITLE #check this format
+    description = constants.DESCRIPTION
+    instrument = constants.INSTRUMENT
 
     # example filename = "wc2.1_10m_01.tif"
     climate_mode = [file.spilt('_')[0]]
@@ -97,6 +97,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         )
 
     return item
+    #add assets for each month: month=item, asset=variables
+    #iterate though items to get proper assets
 
 
 def create_collection(metadata: dict):
@@ -115,7 +117,7 @@ def create_collection(metadata: dict):
     end_datetime = end_datetime
 
     geometry = json.loads(metadata.get("geojson_geom").get(
-        "@value"))  # should this be changed or is it creating the json?
+        "@value"))  
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
 
     collection = pystac.Collection(
@@ -132,3 +134,6 @@ def create_collection(metadata: dict):
     collection.add_link(LICENSE_LINK)
 
     return collection
+
+    #add stac package extensions:
+    #version: for when WorldClim2.2 is ready
