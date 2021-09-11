@@ -1,22 +1,46 @@
 # stactools-package
 
-Template repostitory for [stactools](https://github.com/stac-utils/stactools) packages.
+stactools worldclim
+Name: worldclim
+Package: stactools.worldclim
+PyPI: https://pypi.org/project/stactools-worldclim/
+Owner: @sparkgeo
+Dataset homepage: WorldClim
+STAC extensions used:
 
-## How to use
+version
+scientific
+projection 
+item assets
 
-1. Clone this template repository as your package name, e.g. `landsat`.
-   This name should be short, memorable, and a valid Python package name (i.e. it shouldn't start with a number, etc).
-   It can, however, include a hyphen, in which case the name for Python imports will be the underscored version, e.g. `landsat-8` goes to `stactools.landsat_8`.
-   Your name will be used on PyPI to publish the package in the stactools namespace, e.g. `stactools-landsat`.
-2. Change into the top-level directory of your package and run `scripts/rename`.
-   This will update _most_ of the files in the repository with your new package name.
-   You'll have to manually update `setup.cfg` and `README.md`.
-3. Update `setup.cfg` with your package name, description, and such.
-4. Rewrite this README to provide information about how to use your package.
-5. Update the LICENSE with your company's information (or whomever holds the copyright).
-6. Run `sphinx-quickstart` in the `docs` directory to create the documentation template.
+This is WorldClim version 2.1 climate data for 1970-2000. This version was released in January 2020. There are monthly climate data for minimum, mean, and maximum temperature, precipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There are also 19 “bioclimatic” variables. The data is available at the four spatial resolutions, between 30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a “zip” file containing 12 GeoTiff (.tif) files, one for each month of the year (January is 1; December is 12).
 
-Description:
-"This is WorldClim version 2.1 climate data for 1970-2000. This version was released in January 2020. There are monthly climate data for minimum, mean, and maximum temperature, precipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There are also 19 “bioclimatic” variables. The data is available at the four spatial resolutions, between 30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a “zip” file containing 12 GeoTiff (.tif) files, one for each month of the year (January is 1; December is 12)."
+Weather station data from between 9000 and 60 000 weather stations were interpolated using thin-plate splines with covariates including elevation, distance to the coast and three satellite-derived covariates: maximum and minimum land surface temperature as well as cloud cover, obtained with the MODIS satellite platform
 
-How to use this package:
+Usage
+Using the CLI
+# Create a COG - creates /path/to/local_cog.tif
+stac worldclim create-cog -d "/path/to/directory" -s "/path/to/local.tif"
+# Create extent asset
+worldclim create-extent-asset -d "/path/to/directory"
+# Create a STAC Item - creates /path/to/directory/local_cog.json
+stac worldclim create-item -d "/path/to/directory" -c "/path/to/local_cog.tif" -e "/path/to/extent.geojson"
+# STAC Collection
+stac worldclim create-collection -d "/path/to/directory"
+As a python module
+from stactools.worldclim.constants import JSONLD_HREF
+from stactools.worldclim import utils, cog, stac
+
+# Read metadata
+metadata = utils.get_metadata(JSONLD_HREF)
+
+# Create a STAC Collection
+json_path = os.path.join(tmp_dir, "/path/to/worldclim.json")
+stac.create_collection(metadata, json_path)
+
+# Create a COG
+cog.create_cog("/path/to/local.tif", "/path/to/cog.tif")
+
+# Create a STAC Item
+stac.create_item(metadata, "/path/to/item.json", "/path/to/cog.tif")
+
