@@ -20,6 +20,9 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     if [ "${1:-}" = "--help" ]; then
         usage
     else
+        ls
+        echo "$(pwd)"
+        echo "$DOCKER_WORKDIR"
         docker run --rm \
             -v $(pwd):$DOCKER_WORKDIR \
             stactools-${DOCKER_REPO}-script-runner "$@"
