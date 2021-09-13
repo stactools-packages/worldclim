@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 from dateutil.relativedelta import relativedelta
+from pystac.extensions.base import PropertiesExtension
 import pytz
 import json
 import logging
@@ -12,6 +13,22 @@ from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
                                            LICENSE_LINK, INSTRUMENT)
 
 import pystac
+from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent, CatalogType,
+                    MediaType)
+
+from pystac.extensions.projection import (SummariesProjectionExtension, ProjectionExtension)
+from pystac.extensions.scientific import ScientificExtension
+from pystac.extensions.raster import RasterExtension, RasterBand
+from pystac.extensions.file import FileExtension
+from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
+from pystac.extensions.label import (
+    LabelClasses,
+    LabelExtension,
+    LabelTask,
+    LabelType,
+)
+from pystac.item import Item
+from pystac.summaries import Summaries
 from shapely.geometry import Polygon
 
 logger = logging.getLogger(__name__)
@@ -19,7 +36,7 @@ logger = logging.getLogger(__name__)
 def create_collection(metadata: dict):
     # Creates a STAC collection for a WorldClim dataset
 
-    title = metadata.("tiff_metadata").get("title")
+    title = metadata("tiff_metadata").get("title")
 
     utc = pytz.utc
     year = title.split(" ")[0]
@@ -44,11 +61,12 @@ def create_collection(metadata: dict):
         extent=pystac.Extent(
             pystac.SpatialExtent(bbox),
             pystac.TemporalExtent([start_datetime, end_datetime])),
-        catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED,
-    ​
-    item_assets = ItemAssetsExtension.ext(collection, add_if_missing=True)
-​
-    item_assets.item_assets = {
+        catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED
+    ),
+    
+    item_assets_ext = pystac.ItemAssetsExtension.ext(collection, add_if_missing=True)
+
+    item_assets_ext.item_assets = {
         "tmin_tiff":
         AssetDefinition({
             "type":
@@ -106,22 +124,21 @@ def create_collection(metadata: dict):
             "TIFF containing 30s resolution water vapor pressure information "
         })
     },
-    "sci:doi": "https://doi.org/10.1002/joc.5086",
-    "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
-    "sci:publications": [
-    {
-      "doi": "https://doi.org/10.1002/joc.5086",
-      "citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315."
-    },
-    
-    "properties": {
-    "version": "2.1",
-    "title": "WorldClim version 2.1",
-    "description": constants.DESCRIPTION
-    "datetime": "" #get datetime info
-    },
+    ScientificExtension({ 
+        "sci:doi": "https://doi.org/10.1002/joc.5086",
+        "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+        "sci:publications": [],
+        "doi": "https://doi.org/10.1002/joc.5086",
+        "citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315."
+    }),
+    PropertiesExtension({
+        "properties": "" ,
+        "version": "2.1",
+        "title": "WorldClim version 2.1",
+        "description": constants.DESCRIPTION,
+        "datetime": "" #get datetime info
+    }),
 
-    )
     collection.add_link(LICENSE_LINK)
 
     return collection
@@ -254,9 +271,10 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["water vapor pressure"],
             title="Water Vapor Pressure (kPa)",
-        ),
-
-    if cog_href is not None:
+        )
+    )
+    
+    if cog_href is not None(
         # Create COG asset if it exists.
         item.add_asset(
             "worldclim",
@@ -267,30 +285,25 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
                 title="WorldClim COGs",
             ),
         )
-
-    if start_datetime and end_datetime:
-        item.common_metadata.start_datetime = start_datetime
-        item.common_metadata.end_datetime = end_datetime
-
-    item.ext.enable("projection")
-    item.ext.projection.epsg = WORLDCLIM_EPSG
-
-    ]
-    # Projection Extension: taken from nrcan landcover script, might need to change
-    cog_asset_projection = ProjectionExtension.ext(cog_asset,
-                                                       add_if_missing=True)
+    )
+    
+# Complete the projection extension
+    cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset, add_if_missing=True))
     cog_asset_projection.epsg = item_projection.epsg
     cog_asset_projection.bbox = item_projection.bbox
     cog_asset_projection.transform = item_projection.transform
     cog_asset_projection.shape = item_projection.shape
-#  Label Extension (doesn't seem to handle Assets properly)
+
+        # Complete the label Extension
     cog_asset.extra_fields["label:type"] = item_label.label_type
     cog_asset.extra_fields["label:tasks"] = item_label.label_tasks
-    cog_asset.extra_fields["label:properties"] = item_label.label_properties
-    cog_asset.extra_fields["label:description"] = item_label.label_description
+    cog_asset.extra_fields[
+        "label:properties"] = item_label.label_properties
+     cog_asset.extra_fields[
+        "label:description"] = item_label.label_description
     cog_asset.extra_fields["label:classes"] = [
-    item_label.label_classes[0].to_dict()
-    ]
+        item_label.label_classes[0].to_dict()
+        ]
     
     return item
 
