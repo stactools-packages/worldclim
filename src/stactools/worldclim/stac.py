@@ -127,16 +127,16 @@ def create_collection(metadata: dict):
     ScientificExtension({ 
         "sci:doi": "https://doi.org/10.1002/joc.5086",
         "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
-        "sci:publications": [],
+        "sci:publications": None,
         "doi": "https://doi.org/10.1002/joc.5086",
         "citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315."
     }),
     PropertiesExtension({
-        "properties": "" ,
+        "properties": None ,
         "version": "2.1",
         "title": "WorldClim version 2.1",
         "description": constants.DESCRIPTION,
-        "datetime": "" #get datetime info
+        "datetime": dataset_datetime #get datetime info
     }),
 
     collection.add_link(LICENSE_LINK)
@@ -308,15 +308,15 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
 return item
 
 #create collection for bioclim variables
+#month data not stored in bioclim variables 
 def create_collection(metadata: dict):
-    # Creates a STAC collection for a WorldClim dataset
+    # Creates a STAC collection for a WorldClim bioclim variables dataset
 
     title = metadata("tiff_metadata").get("title")
 
     utc = pytz.utc
     year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(
-        year, "%Y"))  # need this to be month_yr
+    dataset_datetime = utc.localize(datetime.strptime(year, "%Y"))  # need this to be month_yr
 
     end_datetime = dataset_datetime + relativedelta(years=30)  # months 01-12
 
@@ -499,16 +499,16 @@ def create_collection(metadata: dict):
     ScientificExtension({ 
         "sci:doi": "https://doi.org/10.1002/joc.5086",
         "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
-        "sci:publications": [],
+        "sci:publications": None,
         "doi": "https://doi.org/10.1002/joc.5086",
         "citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315."
     }),
     PropertiesExtension({
-        "properties": "" ,
+        "properties": None,
         "version": "2.1",
         "title": "WorldClim version 2.1",
         "description": constants.DESCRIPTION,
-        "datetime": "" #get datetime info
+        "datetime": dataset_datetime #get datetime info
     }),
 
     collection.add_link(LICENSE_LINK)
