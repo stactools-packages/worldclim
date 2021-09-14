@@ -49,7 +49,7 @@ def create_collection(metadata: dict):
     end_datetime = end_datetime
 
     geometry = json.loads(metadata.get("geojson_geom").get(
-        "@value"))  
+        "@value"))
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
 
     collection = pystac.Collection(
@@ -63,7 +63,7 @@ def create_collection(metadata: dict):
             pystac.TemporalExtent([start_datetime, end_datetime])),
         catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED
     ),
-    
+
     item_assets_ext = pystac.ItemAssetsExtension.ext(collection, add_if_missing=True)
 
     item_assets_ext.item_assets = {
@@ -124,7 +124,7 @@ def create_collection(metadata: dict):
             "TIFF containing 30s resolution water vapor pressure information "
         })
     },
-    ScientificExtension({ 
+    ScientificExtension({
         "sci:doi": "https://doi.org/10.1002/joc.5086",
         "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
         "sci:publications": [],
@@ -154,7 +154,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         pystac.Item: STAC Item object.
     """
 
-    title = constants.WORLDCLIM_TITLE 
+    title = constants.WORLDCLIM_TITLE
     description = constants.DESCRIPTION
     instrument = constants.INSTRUMENT
 
@@ -211,7 +211,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     )
     # Create metadata asset
     item.add_asset(
-        "tmin",  
+        "tmin",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -220,7 +220,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "tmax",  
+        "tmax",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -229,7 +229,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "tavg",  
+        "tavg",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -238,7 +238,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "precipitation",  
+        "precipitation",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -247,7 +247,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "solar radiation",  
+        "solar radiation",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -256,7 +256,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "wind speed",  
+        "wind speed",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -265,7 +265,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "water vapor pressure",  
+        "water vapor pressure",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -273,7 +273,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="Water Vapor Pressure (kPa)",
         )
     )
-    
+
     if cog_href is not None(
         # Create COG asset if it exists.
         item.add_asset(
@@ -286,7 +286,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             ),
         )
     )
-    
+
 # Complete the projection extension
     cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset, add_if_missing=True))
     cog_asset_projection.epsg = item_projection.epsg
@@ -304,7 +304,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     cog_asset.extra_fields["label:classes"] = [
         item_label.label_classes[0].to_dict()
         ]
-    
+
 return item
 
 #create collection for bioclim variables
@@ -324,7 +324,7 @@ def create_collection(metadata: dict):
     end_datetime = end_datetime
 
     geometry = json.loads(metadata.get("geojson_geom").get(
-        "@value"))  
+        "@value"))
     bbox = Polygon(geometry.get("coordinates")[0]).bounds
 
     collection = pystac.Collection(
@@ -338,7 +338,7 @@ def create_collection(metadata: dict):
             pystac.TemporalExtent([start_datetime, end_datetime])),
         catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED
     ),
-    
+
     item_assets_ext = pystac.ItemAssetsExtension.ext(collection, add_if_missing=True)
 
 
@@ -496,7 +496,7 @@ def create_collection(metadata: dict):
             "TIFF containing 30s resolution BIO19 = Precipitation of Coldest Quarter information "
         })
     },
-    ScientificExtension({ 
+    ScientificExtension({
         "sci:doi": "https://doi.org/10.1002/joc.5086",
         "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
         "sci:publications": [],
@@ -527,7 +527,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         pystac.Item: STAC Item object.
     """
 
-    title = constants.WORLDCLIM_TITLE 
+    title = constants.WORLDCLIM_TITLE
     description = constants.DESCRIPTION
     instrument = constants.INSTRUMENT
 
@@ -584,7 +584,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     )
     # Create metadata asset
     item.add_asset(
-        "bio_1",  
+        "bio_1",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -593,7 +593,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "bio_2",  
+        "bio_2",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -602,7 +602,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "bio_3",  
+        "bio_3",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -611,7 +611,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "bio_4",  
+        "bio_4",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -620,7 +620,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "bio_5",  
+        "bio_5",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -629,7 +629,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "bio_6",  
+        "bio_6",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -638,7 +638,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         ),
 
     item.add_asset(
-        "bio_7",  
+        "bio_7",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -646,7 +646,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO7 = Temperature Annual Range (BIO5-BIO6))",
         )
     item.add_asset(
-        "bio_8",  
+        "bio_8",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -654,7 +654,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO8 = Mean Temperature of Wettest Quarter)",
         ),
     item.add_asset(
-        "bio_9",  
+        "bio_9",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -662,7 +662,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO9 = Mean Temperature of Driest Quarter",
         ),
     item.add_asset(
-        "bio_10",  
+        "bio_10",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -670,7 +670,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO10 = Mean Temperature of Warmest Quarter",
         ),
     item.add_asset(
-        "bio_11",  
+        "bio_11",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -678,7 +678,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO11 = Mean Temperature of Coldest Quarter",
         ),
     item.add_asset(
-        "bio_12",  
+        "bio_12",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -686,7 +686,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO12 = Annual Precipitation",
         ),
     item.add_asset(
-        "bio_13",  
+        "bio_13",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -694,7 +694,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO13 = Precipitation of Wettest Month",
         ),
     item.add_asset(
-        "bio_14",  
+        "bio_14",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -702,7 +702,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO14 = Precipitation of Driest Month",
         ),
     item.add_asset(
-        "bio_15",  
+        "bio_15",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -710,7 +710,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO15 = Precipitation Seasonality (Coefficient of Variation)",
         ),
     item.add_asset(
-        "bio_16",  
+        "bio_16",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -718,7 +718,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO16 = Precipitation of Wettest Quarter",
         ),
     item.add_asset(
-        "bio_17",  
+        "bio_17",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -726,7 +726,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO17 = Precipitation of Driest Quarter",
         ),
     item.add_asset(
-        "bio_18",  
+        "bio_18",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -734,7 +734,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO18 = Precipitation of Warmest Quarter",
         ),
     item.add_asset(
-        "bio_19",  
+        "bio_19",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
@@ -742,7 +742,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             title="BIO19 = Precipitation of Coldest Quarter",
         )
     )
-    
+
     if cog_href is not None(
         # Create COG asset if it exists.
         item.add_asset(
@@ -755,7 +755,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             ),
         )
     )
-    
+
 # Complete the projection extension
     cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset, add_if_missing=True))
     cog_asset_projection.epsg = item_projection.epsg
@@ -773,5 +773,5 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     cog_asset.extra_fields["label:classes"] = [
         item_label.label_classes[0].to_dict()
         ]
-    
+
 return item

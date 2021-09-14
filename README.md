@@ -10,7 +10,7 @@ STAC extensions used:
 
 version
 scientific
-projection 
+projection
 item assets
 
 This is WorldClim version 2.1 climate data for 1970-2000. This version was released in January 2020. There are monthly climate data for minimum, mean, and maximum temperature, precipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There are also 19 “bioclimatic” variables. The data is available at the four spatial resolutions, between 30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a “zip” file containing 12 GeoTiff (.tif) files, one for each month of the year (January is 1; December is 12).
@@ -43,4 +43,3 @@ cog.create_cog("/path/to/local.tif", "/path/to/cog.tif")
 
 # Create a STAC Item
 stac.create_item(metadata, "/path/to/item.json", "/path/to/cog.tif")
-
