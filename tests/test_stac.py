@@ -11,7 +11,7 @@ class StacTest(unittest.TestCase):
         collection.set_self_href("")
 
         # Check that it has some required attributes
-        self.assertEqual(collection.id, "my-collection-id")
+        self.assertEqual(collection.id, "world-clim")
         # self.assertEqual(collection.other_attr...
 
         # Validate
@@ -20,10 +20,10 @@ class StacTest(unittest.TestCase):
     def test_create_item(self):
         # Write tests for each for the creation of STAC Items
         # Create the STAC Item...
-        item = stac.create_item("/path/to/asset.tif")
+        item = stac.create_item("/path/to/asset.tif") #change this
 
         # Check that it has some required attributes
-        self.assertEqual(item.id, "my-item-id")
+        self.assertEqual(item.id, "my-item-id") #create IDs for all other items
         # self.assertEqual(item.other_attr...
 
         # Validate

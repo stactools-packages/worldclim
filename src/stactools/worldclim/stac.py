@@ -7,7 +7,7 @@ import json
 import logging
 import rasterio
 from stactools.worldclim import constants
-from stactools.worldclim.constants import (WORLDCLIM_ID, WORLDCLIM_EPSG,
+from stactools.worldclim.constants import (WORLDCLIM_CRS, WORLDCLIM_ID, WORLDCLIM_EPSG,
                                            WORLDCLIM_TITLE, DESCRIPTION,
                                            WORLDCLIM_PROVIDER, LICENSE,
                                            LICENSE_LINK, INSTRUMENT)
@@ -138,6 +138,16 @@ def create_collection(metadata: dict):
         "description": constants.DESCRIPTION,
         "datetime": dataset_datetime #get datetime info
     }),
+    dataset_worldclim = rasterio.open(WORLDCLIM_TITLE)
+    ProjectionExtension({
+        "epsg": WORLDCLIM_EPSG,
+        "wkt2": "World Geodetic System 1984",
+        "projjson": WORLDCLIM_CRS #projjson object representing the CRS that bbox and geometry represent,
+        "bbox": dataset_worldclim.bounds, #self defined? Bounding box of the Item in the asset CRS in 2 or 3 dimensions.
+        "centroid": ''# Center      (   0.0000000,   0.0000000) (  0d 0' 0.01"E,  0d 0' 0.01"N))
+        'shape': ''#[integer] Number of pixels in Y and X directions for the default grid
+        "transform": ''#[number]The affine transformation coefficients for the default grid
+    }),
 
     collection.add_link(LICENSE_LINK)
 
@@ -207,7 +217,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.JSON,
             roles=["metadata"],
             title="WorldClim version 2.1 metadata",
-        ),
+        )
     )
     # Create metadata asset
     item.add_asset(
@@ -217,8 +227,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["tmin"],
             title="Minimum Temperature (°C)",
-        ),
-
+        )
+    )
     item.add_asset(
         "tmax",  
         pystac.Asset(
@@ -226,8 +236,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["tmax"],
             title="Maximum Temperature (°C)",
-        ),
-
+        )
+    )
     item.add_asset(
         "tavg",  
         pystac.Asset(
@@ -235,8 +245,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["tavg"],
             title="Average Temperature (°C)",
-        ),
-
+        )
+    )
     item.add_asset(
         "precipitation",  
         pystac.Asset(
@@ -244,8 +254,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["precipitation"],
             title="Precipitation (mm)",
-        ),
-
+        )
+    )   
     item.add_asset(
         "solar radiation",  
         pystac.Asset(
@@ -253,8 +263,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["solar radiation"],
             title="Solar Radiation (kJ m-2 day-1)",
-        ),
-
+        )
+    )
     item.add_asset(
         "wind speed",  
         pystac.Asset(
@@ -262,8 +272,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["wind speed"],
             title="Wind Speed (m s-1)",
-        ),
-
+        )
+    )
     item.add_asset(
         "water vapor pressure",  
         pystac.Asset(
@@ -282,28 +292,17 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
                 href=cog_href,
                 media_type=pystac.MediaType.COG,
                 roles=["data"],
-                title="WorldClim COGs",
-            ),
+                title="WorldClim COGs"
+            )
         )
     )
     
 # Complete the projection extension
-    cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset, add_if_missing=True))
+    cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset, add_if_missing=True)
     cog_asset_projection.epsg = item_projection.epsg
     cog_asset_projection.bbox = item_projection.bbox
     cog_asset_projection.transform = item_projection.transform
     cog_asset_projection.shape = item_projection.shape
-
-        # Complete the label Extension
-    cog_asset.extra_fields["label:type"] = item_label.label_type
-    cog_asset.extra_fields["label:tasks"] = item_label.label_tasks
-    cog_asset.extra_fields[
-        "label:properties"] = item_label.label_properties
-     cog_asset.extra_fields[
-        "label:description"] = item_label.label_description
-    cog_asset.extra_fields["label:classes"] = [
-        item_label.label_classes[0].to_dict()
-        ]
     
 return item
 
@@ -580,7 +579,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.JSON,
             roles=["metadata"],
             title="WorldClim version 2.1 metadata",
-        ),
+        )
     )
     # Create metadata asset
     item.add_asset(
@@ -590,8 +589,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO1"],
             title="BIO1 = Annual Mean Temperature information",
-        ),
-
+        )
+    )
     item.add_asset(
         "bio_2",  
         pystac.Asset(
@@ -599,8 +598,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO2"],
             title="BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))",
-        ),
-
+        )
+    )
     item.add_asset(
         "bio_3",  
         pystac.Asset(
@@ -608,8 +607,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO3"],
             title="BIO3 = Isothermality (BIO2/BIO7) (×100)",
-        ),
-
+        )
+    )
     item.add_asset(
         "bio_4",  
         pystac.Asset(
@@ -617,8 +616,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO4"],
             title="BIO4 = Temperature Seasonality (standard deviation ×100)",
-        ),
-
+        )
+    )
     item.add_asset(
         "bio_5",  
         pystac.Asset(
@@ -626,8 +625,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO5"],
             title="BIO5 = Max Temperature of Warmest Month",
-        ),
-
+        )
+    )
     item.add_asset(
         "bio_6",  
         pystac.Asset(
@@ -635,8 +634,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO6"],
             title="BIO6 = Min Temperature of Coldest Month",
-        ),
-
+        )
+    )
     item.add_asset(
         "bio_7",  
         pystac.Asset(
@@ -645,6 +644,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             roles=["BIO7"],
             title="BIO7 = Temperature Annual Range (BIO5-BIO6))",
         )
+    )
     item.add_asset(
         "bio_8",  
         pystac.Asset(
@@ -652,7 +652,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO8"],
             title="BIO8 = Mean Temperature of Wettest Quarter)",
-        ),
+        )
+    )
     item.add_asset(
         "bio_9",  
         pystac.Asset(
@@ -660,7 +661,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO9"],
             title="BIO9 = Mean Temperature of Driest Quarter",
-        ),
+        )
+    )
     item.add_asset(
         "bio_10",  
         pystac.Asset(
@@ -668,7 +670,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO10"],
             title="BIO10 = Mean Temperature of Warmest Quarter",
-        ),
+        )
+    )
     item.add_asset(
         "bio_11",  
         pystac.Asset(
@@ -676,7 +679,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO11"],
             title="BIO11 = Mean Temperature of Coldest Quarter",
-        ),
+        )
+    )
     item.add_asset(
         "bio_12",  
         pystac.Asset(
@@ -684,7 +688,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO12"],
             title="BIO12 = Annual Precipitation",
-        ),
+        )
+    )
     item.add_asset(
         "bio_13",  
         pystac.Asset(
@@ -692,7 +697,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO13"],
             title="BIO13 = Precipitation of Wettest Month",
-        ),
+        )
+    )
     item.add_asset(
         "bio_14",  
         pystac.Asset(
@@ -700,7 +706,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO14"],
             title="BIO14 = Precipitation of Driest Month",
-        ),
+        )
+    )
     item.add_asset(
         "bio_15",  
         pystac.Asset(
@@ -708,7 +715,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO15"],
             title="BIO15 = Precipitation Seasonality (Coefficient of Variation)",
-        ),
+        )
+    )
     item.add_asset(
         "bio_16",  
         pystac.Asset(
@@ -716,7 +724,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO16"],
             title="BIO16 = Precipitation of Wettest Quarter",
-        ),
+        )
+    )
     item.add_asset(
         "bio_17",  
         pystac.Asset(
@@ -724,7 +733,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO17"],
             title="BIO17 = Precipitation of Driest Quarter",
-        ),
+        )
+    )
     item.add_asset(
         "bio_18",  
         pystac.Asset(
@@ -732,7 +742,8 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO18"],
             title="BIO18 = Precipitation of Warmest Quarter",
-        ),
+        )
+    )
     item.add_asset(
         "bio_19",  
         pystac.Asset(
@@ -751,13 +762,13 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
                 href=cog_href,
                 media_type=pystac.MediaType.COG,
                 roles=["data"],
-                title="WorldClim BIO COGs",
-            ),
+                title="WorldClim BIO COGs"
+            )
         )
     )
     
 # Complete the projection extension
-    cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset, add_if_missing=True))
+    cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset, add_if_missing=True)
     cog_asset_projection.epsg = item_projection.epsg
     cog_asset_projection.bbox = item_projection.bbox
     cog_asset_projection.transform = item_projection.transform
