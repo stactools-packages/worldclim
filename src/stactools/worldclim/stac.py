@@ -148,11 +148,10 @@ def create_collection(metadata: dict):
         "proj:epsg": WORLDCLIM_EPSG,
         "proj:wkt2": "World Geodetic System 1984",
         "proj:projjson": WORLDCLIM_CRS,
-        "proj:bbox": [-180, -90, 180, 90],
+        "proj:bbox": [-180, 90, 180, -90],
         "proj:centroid": [0, 0],
         'proj:shape': [4320, 8640],
-        "proj:transform":
-        ''  #[number]The affine transformation coefficients for the default grid
+        "proj:transform": [-180, 360, 0, 90, 0, 180]
     }),
 
     collection.add_link(LICENSE_LINK)
@@ -520,6 +519,15 @@ def create_collection(metadata: dict):
         "title": "WorldClim version 2.1",
         "description": constants.DESCRIPTION,
         "datetime": dataset_datetime  #get datetime info
+    }),
+    ProjectionExtension({
+        "proj:epsg": WORLDCLIM_EPSG,
+        "proj:wkt2": "World Geodetic System 1984",
+        "proj:projjson": WORLDCLIM_CRS,
+        "proj:bbox": [-180, 90, 180, -90],
+        "proj:centroid": [0, 0],
+        'proj:shape': [4320, 8640],
+        "proj:transform": [-180, 360, 0, 90, 0, 180]
     }),
 
     collection.add_link(LICENSE_LINK)
