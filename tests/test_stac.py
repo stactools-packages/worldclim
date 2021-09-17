@@ -20,7 +20,9 @@ class StacTest(unittest.TestCase):
     def test_create_item(self):
         # Write tests for each for the creation of STAC Items
         # Create the STAC Item...
-        item = stac.create_item("/Users/cpapalaz/Downloads/wc2.1_2.5m_prec/wc2.1_2.5m_prec_05.tif")  #change this
+        item = stac.create_item(
+            "/Users/cpapalaz/Downloads/wc2.1_2.5m_prec/wc2.1_2.5m_prec_05.tif"
+        )  #change this
 
         # Check that it has some required attributes
         self.assertEqual(item.id,
