@@ -16,18 +16,9 @@ import pystac
 from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
                     CatalogType, MediaType)
 
-from pystac.extensions.projection import (SummariesProjectionExtension,
-                                          ProjectionExtension)
+from pystac.extensions.projection import (ProjectionExtension)
 from pystac.extensions.scientific import ScientificExtension
-from pystac.extensions.raster import RasterExtension, RasterBand
-from pystac.extensions.file import FileExtension
-from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
-from pystac.extensions.label import (
-    LabelClasses,
-    LabelExtension,
-    LabelTask,
-    LabelType,
-)
+from pystac.extensions.item_assets import AssetDefinition
 from pystac.item import Item
 from pystac.summaries import Summaries
 from shapely.geometry import Polygon
@@ -174,7 +165,7 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     description = constants.DESCRIPTION
     instrument = constants.INSTRUMENT
 
-    # example filename = "wc2.1_10m_01.tif"
+    # example filename = "wc2.1_10m_tmin_01.tif"
     climate_mode = [file.spilt('_')[0]]
     gsd = [file.spilt('_')[1]]
     utc = pytz.utc
@@ -226,81 +217,86 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             item_projection.shape = [dataset.height,
                                      dataset.width]  #check this
 
-#for m in month, these are the assets?
-# Create metadata asset
-    item.add_asset(
-        "metadata",  # check asset needs: no metadata file
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.JSON,
-            roles=["metadata"],
-            title="WorldClim version 2.1 metadata",
-        ))
-    # Create metadata asset
-    item.add_asset(
-        "tmin",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["tmin"],
-            title="Minimum Temperature (°C)",
-        ))
-    item.add_asset(
-        "tmax",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["tmax"],
-            title="Maximum Temperature (°C)",
-        ))
-    item.add_asset(
-        "tavg",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["tavg"],
-            title="Average Temperature (°C)",
-        ))
-    item.add_asset(
-        "precipitation",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["precipitation"],
-            title="Precipitation (mm)",
-        ))
-    item.add_asset(
-        "solar radiation",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["solar radiation"],
-            title="Solar Radiation (kJ m-2 day-1)",
-        ))
-    item.add_asset(
-        "wind speed",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["wind speed"],
-            title="Wind Speed (m s-1)",
-        ))
-    item.add_asset(
-        "water vapor pressure",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["water vapor pressure"],
-            title="Water Vapor Pressure (kPa)",
-        ))
+    months = [
+        "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "10",
+        "11", "12"
+    ]
+    for m in months:
+        # Create metadata asset
+        item.add_asset(
+            "metadata",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.JSON,
+                roles=["metadata"],
+                title="WorldClim version 2.1 metadata",
+            ))
+        # Create metadata asset
+        item.add_asset(
+            "tmin",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.TIFF,
+                roles=["tmin"],
+                title="Minimum Temperature (°C)",
+            ))
+        item.add_asset(
+            "tmax",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.TIFF,
+                roles=["tmax"],
+                title="Maximum Temperature (°C)",
+            ))
+        item.add_asset(
+            "tavg",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.TIFF,
+                roles=["tavg"],
+                title="Average Temperature (°C)",
+            ))
+        item.add_asset(
+            "precipitation",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.TIFF,
+                roles=["precipitation"],
+                title="Precipitation (mm)",
+            ))
+        item.add_asset(
+            "solar radiation",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.TIFF,
+                roles=["solar radiation"],
+                title="Solar Radiation (kJ m-2 day-1)",
+            ))
+        item.add_asset(
+            "wind speed",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.TIFF,
+                roles=["wind speed"],
+                title="Wind Speed (m s-1)",
+            ))
+        item.add_asset(
+            "water vapor pressure",
+            pystac.Asset(
+                href=file_url,
+                media_type=pystac.MediaType.TIFF,
+                roles=["water vapor pressure"],
+                title="Water Vapor Pressure (kPa)",
+            ))
 
-    if cog_href is not None:
-        # Create COG asset if it exists.
-        item.add_asset("worldclim",
-                       cog_asset=pystac.Asset(href=cog_href,
-                                              media_type=pystac.MediaType.COG,
-                                              roles=["data"],
-                                              title="WorldClim COGs"))
+        if cog_href is not None:
+            # Create COG asset if it exists.
+            item.add_asset("worldclim",
+                           cog_asset=pystac.Asset(
+                               href=cog_href,
+                               media_type=pystac.MediaType.COG,
+                               roles=["data"],
+                               title="WorldClim COGs"))
 
 # Complete the projection extension
     cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset,
