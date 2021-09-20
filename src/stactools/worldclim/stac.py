@@ -298,13 +298,14 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
                                roles=["data"],
                                title="WorldClim COGs"))
 
-# Complete the projection extension
-    cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset,
-                                                          add_if_missing=True)
-    cog_asset_projection.epsg = item_projection.epsg
-    cog_asset_projection.bbox = item_projection.bbox
-    cog_asset_projection.transform = item_projection.transform
-    cog_asset_projection.shape = item_projection.shape
+    # Include projection information
+    proj_ext = ProjectionExtension.ext(item, add_if_missing=True)
+    proj_ext.epsg = item_projection.epsg
+    proj_ext.transform = item_projection.transform
+    proj_ext.bbox = item_projection.bbox
+    proj_ext.wkt2 = item_projection.wkt2
+    proj_ext.shape = item_projection.shape
+    proj_ext.centroid = item_projection.centroid
 
     return item
 
@@ -524,7 +525,7 @@ def create_collection(metadata: dict):
         "proj:centroid": [0, 0],
         'proj:shape': [4320, 8640],
         "proj:transform": [-180, 360, 0, 90, 0, 180]
-    }),
+    })
 
     collection.add_link(LICENSE_LINK)
 
@@ -602,21 +603,17 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     # Create metadata asset
     item.add_asset(
         "metadata",  # check asset needs: no metadata file
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.JSON,
-            roles=["metadata"],
-            title="WorldClim version 2.1 metadata",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.JSON,
+                     roles=["metadata"],
+                     title="WorldClim version 2.1 metadata"))
     # Create metadata asset
     item.add_asset(
         "bio_1",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO1"],
-            title="BIO1 = Annual Mean Temperature information",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO1"],
+                     title="BIO1 = Annual Mean Temperature information"))
     item.add_asset(
         "bio_2",
         pystac.Asset(
@@ -624,145 +621,113 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             media_type=pystac.MediaType.TIFF,
             roles=["BIO2"],
             title=
-            "BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))",
+            "BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))"
         ))
     item.add_asset(
         "bio_3",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO3"],
-            title="BIO3 = Isothermality (BIO2/BIO7) (×100)",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO3"],
+                     title="BIO3 = Isothermality (BIO2/BIO7) (×100)"))
     item.add_asset(
         "bio_4",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
             roles=["BIO4"],
-            title="BIO4 = Temperature Seasonality (standard deviation ×100)",
-        ))
+            title="BIO4 = Temperature Seasonality (standard deviation ×100)"))
     item.add_asset(
         "bio_5",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO5"],
-            title="BIO5 = Max Temperature of Warmest Month",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO5"],
+                     title="BIO5 = Max Temperature of Warmest Month"))
     item.add_asset(
         "bio_6",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO6"],
-            title="BIO6 = Min Temperature of Coldest Month",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO6"],
+                     title="BIO6 = Min Temperature of Coldest Month"))
     item.add_asset(
         "bio_7",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO7"],
-            title="BIO7 = Temperature Annual Range (BIO5-BIO6))",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO7"],
+                     title="BIO7 = Temperature Annual Range (BIO5-BIO6))"))
     item.add_asset(
         "bio_8",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO8"],
-            title="BIO8 = Mean Temperature of Wettest Quarter)",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO8"],
+                     title="BIO8 = Mean Temperature of Wettest Quarter)"))
     item.add_asset(
         "bio_9",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO9"],
-            title="BIO9 = Mean Temperature of Driest Quarter",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO9"],
+                     title="BIO9 = Mean Temperature of Driest Quarter"))
     item.add_asset(
         "bio_10",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO10"],
-            title="BIO10 = Mean Temperature of Warmest Quarter",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO10"],
+                     title="BIO10 = Mean Temperature of Warmest Quarter"))
     item.add_asset(
         "bio_11",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO11"],
-            title="BIO11 = Mean Temperature of Coldest Quarter",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO11"],
+                     title="BIO11 = Mean Temperature of Coldest Quarter"))
     item.add_asset(
         "bio_12",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO12"],
-            title="BIO12 = Annual Precipitation",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO12"],
+                     title="BIO12 = Annual Precipitation"))
     item.add_asset(
         "bio_13",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO13"],
-            title="BIO13 = Precipitation of Wettest Month",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO13"],
+                     title="BIO13 = Precipitation of Wettest Month"))
     item.add_asset(
         "bio_14",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO14"],
-            title="BIO14 = Precipitation of Driest Month",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO14"],
+                     title="BIO14 = Precipitation of Driest Month"))
     item.add_asset(
         "bio_15",
         pystac.Asset(
             href=file_url,
             media_type=pystac.MediaType.TIFF,
             roles=["BIO15"],
-            title=
-            "BIO15 = Precipitation Seasonality (Coefficient of Variation)",
+            title="BIO15 = Precipitation Seasonality (Coefficient of Variation)"
         ))
     item.add_asset(
         "bio_16",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO16"],
-            title="BIO16 = Precipitation of Wettest Quarter",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO16"],
+                     title="BIO16 = Precipitation of Wettest Quarter"))
     item.add_asset(
         "bio_17",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO17"],
-            title="BIO17 = Precipitation of Driest Quarter",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO17"],
+                     title="BIO17 = Precipitation of Driest Quarter"))
     item.add_asset(
         "bio_18",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO18"],
-            title="BIO18 = Precipitation of Warmest Quarter",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO18"],
+                     title="BIO18 = Precipitation of Warmest Quarter"))
     item.add_asset(
         "bio_19",
-        pystac.Asset(
-            href=file_url,
-            media_type=pystac.MediaType.TIFF,
-            roles=["BIO19"],
-            title="BIO19 = Precipitation of Coldest Quarter",
-        ))
+        pystac.Asset(href=file_url,
+                     media_type=pystac.MediaType.TIFF,
+                     roles=["BIO19"],
+                     title="BIO19 = Precipitation of Coldest Quarter"))
 
     if cog_href is not None:
         # Create COG asset if it exists.
@@ -772,13 +737,13 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
                                               roles=["data"],
                                               title="WorldClim BIO COGs"))
 
-
-# Complete the projection extension
-    cog_asset_projection = pystac.ProjectionExtension.ext(cog_asset,
-                                                          add_if_missing=True)
-    cog_asset_projection.epsg = item_projection.epsg
-    cog_asset_projection.bbox = item_projection.bbox
-    cog_asset_projection.transform = item_projection.transform
-    cog_asset_projection.shape = item_projection.shape
+    # Include projection information
+    proj_ext = ProjectionExtension.ext(item, add_if_missing=True)
+    proj_ext.epsg = item_projection.epsg
+    proj_ext.transform = item_projection.transform
+    proj_ext.bbox = item_projection.bbox
+    proj_ext.wkt2 = item_projection.wkt2
+    proj_ext.shape = item_projection.shape
+    proj_ext.centroid = item_projection.centroid
 
     return item
