@@ -7,56 +7,58 @@ import json
 import logging
 import rasterio
 from stactools.worldclim import constants
-from stactools.worldclim.constants import (WORLDCLIM_CRS, WORLDCLIM_ID,
-                                           WORLDCLIM_EPSG, WORLDCLIM_TITLE,
-                                           DESCRIPTION, WORLDCLIM_PROVIDER,
-                                           LICENSE, LICENSE_LINK, INSTRUMENT)
+from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION, WORLDCLIM_CRS,
+                                           WORLDCLIM_ID, WORLDCLIM_EPSG,
+                                           WORLDCLIM_TITLE, DESCRIPTION,
+                                           WORLDCLIM_PROVIDER, LICENSE,
+                                           LICENSE_LINK, WORLDCLIM_FTP_bioclim)
 
 import pystac
 from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
-                    CatalogType, MediaType)
+                    CatalogType, MediaType, Item)
 
 from pystac.extensions.projection import (ProjectionExtension)
 from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.item_assets import AssetDefinition
-from pystac.item import Item
-from pystac.summaries import Summaries
+from pystac.extensions.item_assets import ItemAssetsExtension
 from shapely.geometry import Polygon
 
 logger = logging.getLogger(__name__)
 
 
-def create_collection(metadata: dict):
+def create_collection() -> Collection:
     # Creates a STAC collection for a WorldClim dataset
-
-    title = metadata("tiff_metadata").get("title")
+    # need to pass in month data?
+    title = constants.WORLDCLIM_TITLE
 
     utc = pytz.utc
-    year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(
-        year, "%m_%Y"))  # need this to be month_yr
 
-    end_datetime = dataset_datetime + relativedelta(years=30)  # months 01-12
+    start_year = "1970"
+    end_year = "2000"
 
-    start_datetime = dataset_datetime
-    end_datetime = end_datetime
+    start_datestring = start_year
+    start_datetime = utc.localize(datetime.strptime(start_datestring, "%Y%"))
+    print(start_datetime)
 
-    geometry = json.loads(metadata.get("geojson_geom").get("@value"))
-    bbox = Polygon(geometry.get("coordinates")[0]).bounds
+    end_datestring = end_year
+    end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y%"))
+    print(end_datetime)
 
-    collection = pystac.Collection(
-        id=WORLDCLIM_ID,
-        title=WORLDCLIM_TITLE,
-        description=DESCRIPTION,
-        providers=[WORLDCLIM_PROVIDER],
-        license=LICENSE,
-        extent=pystac.Extent(
-            pystac.SpatialExtent(bbox),
-            pystac.TemporalExtent([start_datetime, end_datetime])),
-        catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED),
+    bbox = [-180, 90, 180, -90]
 
-    item_assets_ext = pystac.ItemAssetsExtension.ext(collection,
-                                                     add_if_missing=True)
+    collection = Collection(id=WORLDCLIM_ID,
+                            title=WORLDCLIM_TITLE,
+                            description=DESCRIPTION,
+                            providers=[WORLDCLIM_PROVIDER],
+                            license=LICENSE,
+                            extent=Extent(
+                                SpatialExtent(bbox),
+                                TemporalExtent([start_datetime,
+                                                end_datetime])),
+                            catalog_type=CatalogType.RELATIVE_PUBLISHED),
+
+    item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
+
     #for each month (item) assets are defined below.
     item_assets_ext.item_assets = {
         "tmin_tiff":
@@ -133,7 +135,7 @@ def create_collection(metadata: dict):
         "version": "2.1",
         "title": "WorldClim version 2.1",
         "description": constants.DESCRIPTION,
-        "datetime": dataset_datetime  #get datetime info
+        # "datetime": dataset_datetime
     }),
     ProjectionExtension({
         "proj:epsg": WORLDCLIM_EPSG,
@@ -150,7 +152,7 @@ def create_collection(metadata: dict):
     return collection
 
 
-def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
+def create_item(tiff_href: str, file_url: str, cog_href: str = None) -> Item:
     """Creates a STAC item for a WorldClim dataset.
 
     Args:
@@ -163,15 +165,12 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
 
     title = constants.WORLDCLIM_TITLE
     description = constants.DESCRIPTION
-    instrument = constants.INSTRUMENT
 
-    # example filename = "wc2.1_10m_tmin_01.tif"
-    climate_mode = [file.spilt('_')[0]]
-    gsd = [file.spilt('_')[1]]
+    # example filename = "wc2.1_30s_tmin_01.tif"
+    gsd = [tiff_href.spilt('_')[1]]  #resolution
     utc = pytz.utc
-    month = os.path.splitext(file)[0].split(
-        "_"
-    )[-1]  # extracts the string after the last underscore and before the last period
+    # month extracts the string after the last underscore and before the last period
+    month = os.path.splitext(tiff_href)[0].split("_")[-1]
     start_year = "1970"
     end_year = "2000"
 
@@ -183,16 +182,18 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     end_datetime = utc.localize(datetime.strptime(end_datestring, "%m_%Y"))
     print(end_datetime)
 
-    # use rasterio
-    dataset_worldclim = rasterio.open(title)
-    id = title.replace(" ", "-")
-    # geometry = longitude/latitude
-    geometry = dataset_worldclim.crs  # get geometry based on ESPG
-    bbox = dataset_worldclim.bounds  # get bounding box with rastero.bounds
-    properties = {"title": title, "description": description}
+    # use rasterio to open tiff file
+    if tiff_href is not None:
+        with rasterio.open(tiff_href) as dataset_worldclim:
+            id = title.replace(" ", "-")
+            # get geometry based on ESPG
+            geometry = dataset_worldclim.crs
+            # get bounding box with rastero.bounds
+            bbox = dataset_worldclim.bounds
+            properties = {"title": title, "description": description}
 
-    # Create item
-    item = pystac.Item(
+# Create item
+    item = Item(
         id=id,
         geometry=geometry,
         bbox=bbox,
@@ -217,74 +218,72 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             item_projection.shape = [dataset.height,
                                      dataset.width]  #check this
 
-    months = [
-        "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "10",
-        "11", "12"
-    ]
-    for m in months:
-        # Create metadata asset
+# Create metadata asset for each month
+#make sure it is for the 30s resolution, or include all resolutions?
+# if gsd == '30s':
+#     sort by month (month = os.path.splitext(tiff_href)[0].split("_")[-1]):
         item.add_asset(
             "metadata",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.JSON,
+                media_type=MediaType.JSON,
                 roles=["metadata"],
                 title="WorldClim version 2.1 metadata",
             ))
         # Create metadata asset
         item.add_asset(
             "tmin",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.TIFF,
+                media_type=MediaType.TIFF,
                 roles=["tmin"],
                 title="Minimum Temperature (°C)",
             ))
         item.add_asset(
             "tmax",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.TIFF,
+                media_type=MediaType.TIFF,
                 roles=["tmax"],
                 title="Maximum Temperature (°C)",
             ))
         item.add_asset(
             "tavg",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.TIFF,
+                media_type=MediaType.TIFF,
                 roles=["tavg"],
                 title="Average Temperature (°C)",
             ))
         item.add_asset(
             "precipitation",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.TIFF,
+                media_type=MediaType.TIFF,
                 roles=["precipitation"],
                 title="Precipitation (mm)",
             ))
         item.add_asset(
             "solar radiation",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.TIFF,
+                media_type=MediaType.TIFF,
                 roles=["solar radiation"],
                 title="Solar Radiation (kJ m-2 day-1)",
             ))
         item.add_asset(
             "wind speed",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.TIFF,
+                media_type=MediaType.TIFF,
                 roles=["wind speed"],
                 title="Wind Speed (m s-1)",
             ))
         item.add_asset(
             "water vapor pressure",
-            pystac.Asset(
+            Asset(
                 href=file_url,
-                media_type=pystac.MediaType.TIFF,
+                media_type=MediaType.TIFF,
                 roles=["water vapor pressure"],
                 title="Water Vapor Pressure (kPa)",
             ))
@@ -292,13 +291,12 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         if cog_href is not None:
             # Create COG asset if it exists.
             item.add_asset("worldclim",
-                           cog_asset=pystac.Asset(
-                               href=cog_href,
-                               media_type=pystac.MediaType.COG,
-                               roles=["data"],
-                               title="WorldClim COGs"))
+                           cog_asset=Asset(href=cog_href,
+                                           media_type=MediaType.COG,
+                                           roles=["data"],
+                                           title="WorldClim COGs"))
 
-    # Include projection information
+# Include projection information
     proj_ext = ProjectionExtension.ext(item, add_if_missing=True)
     proj_ext.epsg = item_projection.epsg
     proj_ext.transform = item_projection.transform
@@ -312,37 +310,37 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
 
 #create collection for bioclim variables
 #month data not stored in bioclim variables
-def create_collection(metadata: dict):
+def create_collection() -> Collection:
     # Creates a STAC collection for a WorldClim bioclim variables dataset
 
-    title = metadata("tiff_metadata").get("title")
+    title_bioclim = 'Worldclim Bioclimatic Variables'
 
     utc = pytz.utc
-    year = title.split(" ")[0]
-    dataset_datetime = utc.localize(datetime.strptime(
-        year, "%Y"))  # need this to be month_yr
+    start_year = "1970"
+    end_year = "2000"
 
-    end_datetime = dataset_datetime + relativedelta(years=30)  # months 01-12
+    start_datestring = start_year
+    start_datetime = utc.localize(datetime.strptime(start_datestring, "%Y%"))
+    print(start_datetime)
 
-    start_datetime = dataset_datetime
-    end_datetime = end_datetime
+    end_datestring = end_year
+    end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y%"))
+    print(end_datetime)
 
-    geometry = json.loads(metadata.get("geojson_geom").get("@value"))
-    bbox = Polygon(geometry.get("coordinates")[0]).bounds
+    bbox = [-180, 90, 180, -90]
 
     collection = pystac.Collection(
         id=WORLDCLIM_ID,
-        title=WORLDCLIM_TITLE,
-        description=DESCRIPTION,
-        providers=[WORLDCLIM_PROVIDER],
+        title=title_bioclim,
+        description=BIOCLIM_DESCRIPTION,
+        providers=[WORLDCLIM_PROVIDER[WORLDCLIM_FTP_bioclim]],
         license=LICENSE,
         extent=pystac.Extent(
             pystac.SpatialExtent(bbox),
             pystac.TemporalExtent([start_datetime, end_datetime])),
         catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED),
 
-    item_assets_ext = pystac.ItemAssetsExtension.ext(collection,
-                                                     add_if_missing=True)
+    item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
 
     item_assets_ext.item_assets = {
         "bio_1":
@@ -502,20 +500,22 @@ def create_collection(metadata: dict):
         "sci:doi":
         "https://doi.org/10.1002/joc.5086",
         "sci:citation":
-        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces "
+        "for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
         "sci:publications":
         None,
         "doi":
         "https://doi.org/10.1002/joc.5086",
         "citation":
-        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315."
+        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces "
+        "for global land areas. International Journal of Climatology 37 (12): 4302-4315."
     }),
     PropertiesExtension({
         "properties": None,
         "version": "2.1",
         "title": "WorldClim version 2.1",
         "description": constants.DESCRIPTION,
-        "datetime": dataset_datetime  #get datetime info
+        # "datetime": dataset_datetime
     }),
     ProjectionExtension({
         "proj:epsg": WORLDCLIM_EPSG,
@@ -533,8 +533,8 @@ def create_collection(metadata: dict):
 
 
 #create items for bioclim variables
-def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
-    """Creates a STAC item for a WorldClim dataset.
+def create_item(tiff_href: str, file_url: str, cog_href: str = None) -> Item:
+    """Creates a STAC item for a WorldClim Bioclimatic dataset.
 
     Args:
         metadata_url (str): Path to provider metadata.
@@ -544,17 +544,14 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
         pystac.Item: STAC Item object.
     """
 
-    title = constants.WORLDCLIM_TITLE
-    description = constants.DESCRIPTION
-    instrument = constants.INSTRUMENT
+    title = 'Worldclim Bioclimatic Variables'
+    description = constants.BIOCLIM_DESCRIPTION
 
-    # example filename = "wc2.1_10m_01.tif"
-    climate_mode = [file.spilt('_')[0]]
-    gsd = [file.spilt('_')[1]]
+    # example filename = "wc2.1_5m_bio_1.tif"
+    gsd = [tiff_href.spilt('_')[1]]  #resolution
     utc = pytz.utc
-    month = os.path.splitext(file)[0].split(
-        "_"
-    )[-1]  # extracts the string after the last underscore and before the last period
+    month = os.path.splitext(tiff_href)[0].split("_")[-1]
+    # extracts the string after the last underscore and before the last period
     start_year = "1970"
     end_year = "2000"
 
@@ -567,12 +564,17 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
     print(end_datetime)
 
     # use rasterio
-    dataset_worldclim = rasterio.open(title)
-    id = title.replace(" ", "-")
-    # geometry = longitude/latitude
-    geometry = dataset_worldclim.crs  # get geometry based on ESPG
-    bbox = dataset_worldclim.bounds  # get bounding box with rastero.bounds
-    properties = {"title": title, "description": description}
+    if tiff_href is not None:
+        with rasterio.open(tiff_href) as dataset_worldclim:
+            id = title.replace(" ", "-")
+            # geometry = longitude/latitude - get geom based on EPSG
+            geometry = dataset_worldclim.crs
+            bbox = dataset_worldclim.bounds
+            # get bounding box with rastero.bounds
+            properties = {
+                "title": title,
+                "description": description
+            }  #does this have to match website?
 
     # Create item
     item = pystac.Item(
@@ -600,11 +602,12 @@ def create_item(file: str, file_url: str, cog_href: str = None) -> pystac.Item:
             item_projection.shape = [dataset.height,
                                      dataset.width]  #check this
 
-    # Create metadata asset
+
+# Create metadata asset
     item.add_asset(
         "metadata",  # check asset needs: no metadata file
         pystac.Asset(href=file_url,
-                     media_type=pystac.MediaType.JSON,
+                     media_type=pystac.MediaType.TIFF,
                      roles=["metadata"],
                      title="WorldClim version 2.1 metadata"))
     # Create metadata asset
