@@ -18,13 +18,13 @@ DESCRIPTION = """This is WorldClim version 2.1 climate data for 1970-2000. This 
 released in January 2020. There are monthly climate data for minimum, mean, and maximum temperature,
 precipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There
 are also 19 “bioclimatic” variables. The data is available at the four spatial resolutions, between
-30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a “zip” file containing 12 GeoTiff (.tif)
-files, one for each month of the year (January is 1; December is 12)."""
+30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a “zip” file containing 12 GeoTiff
+(.tif) files, one for each month of the year (January is 1; December is 12)."""
 # more metadata
 INSTRUMENT = """ Weather station data from between 9000 and 60 000 weather stations were interpolated
-using thin-plate splines with covariates including elevation, distance to the coast and three satellite-derived
-covariates: maximum and minimum land surface temperature as well as cloud cover, obtained with the MODIS
-satellite platform"""
+using thin-plate splines with covariates including elevation, distance to the coast and three
+satellite- derived covariates: maximum and minimum land surface temperature as well as cloud cover,
+obtained with the MODIS satellite platform"""
 
 WORLDCLIM_PROVIDER = Provider(
     name="WorldClim",
@@ -87,8 +87,7 @@ WORLDCLIM_FTP_elev = [
 ]  # list of all links
 
 COORDINATE_SYSTEM = {
-    "wkt":
-    ('''GEOGCRS[\"WGS 84\",DATUM[\"World Geodetic System 1984\",
+    "wkt": ('''GEOGCRS[\"WGS 84\",DATUM[\"World Geodetic System 1984\",
     ELLIPSOID[\"WGS 84\",6378137,298.257223563,
     LENGTHUNIT["metre",1]]],
     PRIMEM[\"Greenwich\",0,
@@ -96,8 +95,7 @@ COORDINATE_SYSTEM = {
     CS[\"ellipsoidal\",2],
     AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],
     ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],
-    ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]]'''
-     )
+    ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]]''')
 }
 
 BIOCLIM_DESCRIPTION = """Bioclimatic variables are derived from the monthly temperature
@@ -106,4 +104,5 @@ often used in species distribution modeling and related ecological modeling tech
 The bioclimatic variables represent annual trends (e.g., mean annual temperature, annual
 precipitation) seasonality (e.g., annual range in temperature and precipitation) and extreme
 or limiting environmental factors (e.g., temperature of the coldest and warmest month, and
-precipitation of the wet and dry quarters). A quarter is a period of three months (1/4 of the year)."""
+precipitation of the wet and dry quarters). A quarter is a period of three months
+(1/4 of the year)."""

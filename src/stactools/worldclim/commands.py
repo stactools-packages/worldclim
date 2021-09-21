@@ -31,7 +31,7 @@ def create_worldclim_command(cli):
 
         Args:
             destination (str): Path to output STAC catalog.
-            source (str): Path to NRCan provided metadata - Currently only supports JSON-LD. #dont have this for worldclim, source=constants
+            source (str): Path to Worldclim Metadata (constants.py)
 
         Returns:
             Callable

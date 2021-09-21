@@ -1,9 +1,7 @@
 from datetime import datetime
 import os
-from dateutil.relativedelta import relativedelta
 from pystac.extensions.base import PropertiesExtension
 import pytz
-import json
 import logging
 import rasterio
 from stactools.worldclim import constants
@@ -14,14 +12,13 @@ from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION, WORLDCLIM_CRS,
                                            LICENSE_LINK, WORLDCLIM_FTP_bioclim)
 
 import pystac
-from pystac import (Collection, Asset, Extent, SpatialExtent,
-                TemporalExtent, CatalogType, MediaType, Item)
+from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
+                    CatalogType, MediaType, Item)
 
 from pystac.extensions.projection import (ProjectionExtension)
 from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.item_assets import AssetDefinition
 from pystac.extensions.item_assets import ItemAssetsExtension
-from shapely.geometry import Polygon
 
 logger = logging.getLogger(__name__)
 
@@ -121,13 +118,17 @@ def create_collection() -> Collection:
         "sci:doi":
         "https://doi.org/10.1002/joc.5086",
         "sci:citation":
-        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+        """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
+        resolution climate surfaces for global land areas. International
+        Journal of Climatology 37 (12): 4302-4315.""",
         "sci:publications":
         None,
         "doi":
         "https://doi.org/10.1002/joc.5086",
         "citation":
-        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315."
+        """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
+        resolution climate surfaces for global land areas. International
+        Journal of Climatology 37 (12): 4302-4315."""
     }),
     PropertiesExtension({
         "properties": None,
@@ -169,7 +170,7 @@ def create_item(tiff_href: str, file_url: str, cog_href: str = None) -> Item:
     gsd = [tiff_href.spilt('_')[1]]  #resolution
     utc = pytz.utc
     # month extracts the string after the last underscore and before the last period
-    month = os.path.splitext(tiff_href)[0].split("_")[-1] #sort based on this
+    month = os.path.splitext(tiff_href)[0].split("_")[-1]  #sort based on this
     start_year = "1970"
     end_year = "2000"
 
@@ -356,7 +357,8 @@ def create_collection() -> Collection:
             MediaType.TIFF,
             "roles": ["data"],
             "description":
-            "TIFF containing 30s resolution BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp)) information "
+            """TIFF containing 30s resolution BIO2 = Mean Diurnal Range
+            (Mean of monthly (max temp - min temp)) information """
         }),
         "bio_3":
         AssetDefinition({
@@ -372,7 +374,8 @@ def create_collection() -> Collection:
             MediaType.TIFF,
             "roles": ["data"],
             "description":
-            "TIFF containing 30s resolution BIO4 = Temperature Seasonality (standard deviation ×100) information "
+            """TIFF containing 30s resolution BIO4 = Temperature Seasonality
+            (standard deviation ×100) information """
         }),
         "bio_5":
         AssetDefinition({
@@ -396,7 +399,8 @@ def create_collection() -> Collection:
             MediaType.TIFF,
             "roles": ["data"],
             "description":
-            "TIFF containing 30s resolution BIO7 = Temperature Annual Range (BIO5-BIO6) information "
+            """TIFF containing 30s resolution BIO7 = Temperature Annual Range
+            (BIO5-BIO6) information """
         }),
         "bio_8":
         AssetDefinition({
@@ -420,7 +424,8 @@ def create_collection() -> Collection:
             MediaType.TIFF,
             "roles": ["data"],
             "description":
-            "TIFF containing 30s resolution BIO10 = Mean Temperature of Warmest Quarter information "
+            """TIFF containing 30s resolution BIO10 = Mean Temperature
+            of Warmest Quarter information """
         }),
         "bio_11":
         AssetDefinition({
@@ -428,7 +433,8 @@ def create_collection() -> Collection:
             MediaType.TIFF,
             "roles": ["data"],
             "description":
-            "TIFF containing 30s resolution BIO11 = Mean Temperature of Coldest Quarter information "
+            """TIFF containing 30s resolution BIO11 = Mean
+            Temperature of Coldest Quarter information """
         }),
         "bio_12":
         AssetDefinition({
@@ -460,7 +466,8 @@ def create_collection() -> Collection:
             MediaType.TIFF,
             "roles": ["data"],
             "description":
-            "TIFF containing 30s resolution BIO15 = Precipitation Seasonality (Coefficient of Variation) information "
+            """TIFF containing 30s resolution BIO15 = Precipitation Seasonality
+            (Coefficient of Variation) information """
         }),
         "bio_16":
         AssetDefinition({
@@ -499,15 +506,15 @@ def create_collection() -> Collection:
         "sci:doi":
         "https://doi.org/10.1002/joc.5086",
         "sci:citation":
-        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces "
-        "for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+        """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces
+        for global land areas. International Journal of Climatology 37 (12): 4302-4315.""",
         "sci:publications":
         None,
         "doi":
         "https://doi.org/10.1002/joc.5086",
         "citation":
-        "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces "
-        "for global land areas. International Journal of Climatology 37 (12): 4302-4315."
+        """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces
+        for global land areas. International Journal of Climatology 37 (12): 4302-4315."""
     }),
     PropertiesExtension({
         "properties": None,
