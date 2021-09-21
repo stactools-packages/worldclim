@@ -14,8 +14,8 @@ from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION, WORLDCLIM_CRS,
                                            LICENSE_LINK, WORLDCLIM_FTP_bioclim)
 
 import pystac
-from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
-                    CatalogType, MediaType, Item)
+from pystac import (Collection, Asset, Extent, SpatialExtent,
+                TemporalExtent, CatalogType, MediaType, Item)
 
 from pystac.extensions.projection import (ProjectionExtension)
 from pystac.extensions.scientific import ScientificExtension
@@ -29,7 +29,6 @@ logger = logging.getLogger(__name__)
 def create_collection() -> Collection:
     # Creates a STAC collection for a WorldClim dataset
     # need to pass in month data?
-    title = constants.WORLDCLIM_TITLE
 
     utc = pytz.utc
 
@@ -170,7 +169,7 @@ def create_item(tiff_href: str, file_url: str, cog_href: str = None) -> Item:
     gsd = [tiff_href.spilt('_')[1]]  #resolution
     utc = pytz.utc
     # month extracts the string after the last underscore and before the last period
-    month = os.path.splitext(tiff_href)[0].split("_")[-1]
+    month = os.path.splitext(tiff_href)[0].split("_")[-1] #sort based on this
     start_year = "1970"
     end_year = "2000"
 
