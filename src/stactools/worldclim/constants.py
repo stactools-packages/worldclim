@@ -69,9 +69,9 @@ WORLDCLIM_FTP_wind = [
 ]
 WORLDCLIM_FTP_vap = [
     "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_vapr.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_srad.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_srad.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_srad.zip"
+    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_vapr.zip",
+    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_vapr.zip",
+    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_vapr.zip"
 ]
 WORLDCLIM_FTP_bioclim = [
     "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_bio.zip",
