@@ -3,6 +3,7 @@
 from pyproj import CRS
 from pystac import Provider
 from pystac import Link
+from pystac.provider import ProviderRole
 
 WORLDCLIM_ID = "world-clim"
 WORLDCLIM_EPSG = 4326  # to find  from a tiff file: gdalinfo file_path
@@ -28,7 +29,7 @@ obtained with the MODIS satellite platform"""
 
 WORLDCLIM_PROVIDER = Provider(
     name="WorldClim",
-    roles=["processor", "host"],
+    roles=[ProviderRole.PROCESSOR, ProviderRole.HOST],
     url="https://worldclim.org/data/worldclim21.html")
 
 WORLDCLIM_FTP_tmin = [

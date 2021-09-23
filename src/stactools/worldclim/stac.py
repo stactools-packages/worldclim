@@ -40,7 +40,7 @@ def create_monthly_collection() -> Collection:
     end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y%"))
     print(end_datetime)
 
-    bbox = [-180, 90, 180, -90]
+    bbox = [-180., 90., 180., -90.]
 
     collection = Collection(id=WORLDCLIM_ID,
                             title=WORLDCLIM_TITLE,
@@ -48,9 +48,9 @@ def create_monthly_collection() -> Collection:
                             providers=[WORLDCLIM_PROVIDER],
                             license=LICENSE,
                             extent=Extent(
-                                SpatialExtent(bbox),
-                                TemporalExtent([start_datetime,
-                                                end_datetime])),
+                                SpatialExtent([bbox]),
+                                TemporalExtent([[start_datetime,
+                                                 end_datetime]])),
                             catalog_type=CatalogType.RELATIVE_PUBLISHED),
 
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
@@ -152,10 +152,11 @@ def create_monthly_collection() -> Collection:
     return collection
 
 
-# directory_loc = "/Users/cpapalaz/Documents/climate_data" #directory where the dataset has been downloaded
+# directory_loc = "/Users/cpapalaz/Documents/climate_data"
+# # directory where the dataset has been downloaded
 
 
-def create_monthly_item(resolution_href: str,
+def create_item(resolution_href: str,
                         month_href: str,
                         directory_loc: os.path,
                         cog_href: str = None) -> Item:
@@ -171,8 +172,10 @@ def create_monthly_item(resolution_href: str,
         pystac.Item: STAC Item object.
     """
     # user defined: resolution and month
-    # item function creates an item of the variables in that res and month based on the file name
-    # data organized in folders by month (need function to do this), search for res and variable in filename
+    # item function creates an item of the variables in that res
+    # # and month based on the file name
+    # data organized in folders by month (need function to do this),
+    # # search for res and variable in filename
 
     title = constants.WORLDCLIM_TITLE
     description = constants.DESCRIPTION
@@ -189,8 +192,8 @@ def create_monthly_item(resolution_href: str,
     }
 
     for key in variables_dict.keys():
-
-        tiff_href = "wc2.1_" + resolution_href + "_" + key + "_" + month_href + ".tif"  #file structure
+        # file structure
+        tiff_href = "wc2.1_" + resolution_href + "_" + key + "_" + month_href + ".tif"
 
         utc = pytz.utc
         # month extracts the string after the last underscore and before the last period
