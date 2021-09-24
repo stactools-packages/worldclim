@@ -156,17 +156,16 @@ def create_monthly_collection() -> Collection:
 # # directory where the dataset has been downloaded
 
 
-def create_item(resolution_href: str,
+def create_monthly_item(resolution_href: str,
                         month_href: str,
-                        directory_loc: os.path,
-                        cog_href: str = None) -> Item:
+                        directory_loc: os.path) -> Item:
+
     """Creates a STAC item for a WorldClim dataset.
 
     Args:
         resolution_href (str): Desired item resolution
         month_href (str): Desired item month
         directory_loc (os.path) : Local path to dataset
-        cog_href (str, optional): Path to COG asset.
 
     Returns:
         pystac.Item: STAC Item object.
@@ -185,7 +184,7 @@ def create_item(resolution_href: str,
         "tmin": "Minimum Temperature (°C)",
         "tmax": "Maximum Temperature (°C)",
         "tavg": "Average Temperature (°C)",
-        "precip": "Precipitation (mm)",
+        "prec": "Precipitation (mm)",
         "srad": "Solar Radiation (kJ m-2 day-1)",
         "wind": "Wind Speed (m s-1)",
         "vapr": "Water Vapor Pressure (kPa)"
@@ -194,6 +193,7 @@ def create_item(resolution_href: str,
     for key in variables_dict.keys():
         # file structure
         tiff_href = "wc2.1_" + resolution_href + "_" + key + "_" + month_href + ".tif"
+        print(tiff_href)
 
         utc = pytz.utc
         # month extracts the string after the last underscore and before the last period
@@ -210,9 +210,12 @@ def create_item(resolution_href: str,
         end_datetime = utc.localize(datetime.strptime(end_datestring, "%m_%Y"))
         print(end_datetime)
 
+        tiff_file_path = directory_loc + "/" + month_href + "/" + tiff_href
+        print(tiff_file_path)
+
         # use rasterio to open tiff file
-        if tiff_href is not None:
-            with rasterio.open(tiff_href) as dataset_worldclim:
+        if tiff_file_path is not None:
+            with rasterio.open(tiff_file_path) as dataset_worldclim:
                 id = title.replace(" ", "-")
                 # get geometry based on ESPG
                 geometry = dataset_worldclim.crs
@@ -237,15 +240,8 @@ def create_item(resolution_href: str,
         item_projection = ProjectionExtension.ext(item, add_if_missing=True)
         item_projection.epsg = WORLDCLIM_EPSG
 
-        if cog_href is not None:
-            with rasterio.open(cog_href) as dataset:
-                item_projection.bbox = list(dataset.bounds)
-                item_projection.transform = list(dataset.transform)
-                item_projection.shape = [dataset.height,
-                                         dataset.width]  # check this
-
         # tiff_href = "wc2.1_"+resolution_href+"_"+key+"_"+month_href # file structure defined above
-        tiff_file_path = open(directory_loc + "/" + tiff_href)
+        tiff_file_path = open(tiff_file_path)
 
         # Create asset based on keys in variables_dict
         item.add_asset(
@@ -258,14 +254,6 @@ def create_item(resolution_href: str,
             ))
 
         tiff_file_path.close()
-
-        if cog_href is not None:
-            # Create COG asset if it exists.
-            item.add_asset("worldclim",
-                           cog_asset=Asset(href=cog_href,
-                                           media_type=MediaType.COG,
-                                           roles=["data"],
-                                           title="WorldClim COGs"))
 
 # Include projection information
     proj_ext = ProjectionExtension.ext(item, add_if_missing=True)
@@ -511,14 +499,12 @@ def create_bioclim_collection() -> Collection:
 
 # create items for bioclim variables
 def create_bioclim_item(resolution_href: str,
-                        directory_loc: os.path,
-                        cog_href: str = None) -> Item:
+                        directory_loc: os.path) -> Item:
     """Creates a STAC item for a WorldClim Bioclimatic dataset.
 
     Args:
         resolution_href (str): Desired item resolution
         directory_loc (os.path) : Local path to dataset
-        cog_href (str, optional): Path to COG asset.
 
     Returns:
         pystac.Item: STAC Item object.
@@ -602,12 +588,6 @@ def create_bioclim_item(resolution_href: str,
 
         item_projection = ProjectionExtension.ext(item, add_if_missing=True)
         item_projection.epsg = WORLDCLIM_EPSG
-        if cog_href is not None:
-            with rasterio.open(cog_href) as dataset:
-                item_projection.bbox = list(dataset.bounds)
-                item_projection.transform = list(dataset.transform)
-                item_projection.shape = [dataset.height,
-                                         dataset.width]  # check this
 
         # tiff_href = "wc2.1_"+resolution_href+"_"+key+".tif" # file structure defined above
         tiff_file_path = open(directory_loc + "/" + tiff_href)

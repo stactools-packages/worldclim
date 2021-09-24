@@ -40,20 +40,19 @@ def create_worldclim_command(cli):
     @click.argument("resolution_href")
     @click.argument("month_href")
     @click.argument("directory_loc")
-    @click.argument("cog_href")
+    # @click.argument("cog_href")
 
     def create_item_command(destination: str,
                         resolution_href: str,
                         month_href: str,
-                        directory_loc: os.path,
-                        cog_href: str = None):
+                        directory_loc: os.path):
 
         """Creates a STAC Item
         Args:
             source (str): HREF of the Asset associated with the Item
             destination (str): An HREF for the STAC Collection
         """
-        item = stac.create_item(resolution_href, month_href, directory_loc, cog_href)
+        item = stac.create_monthly_item(resolution_href, month_href, directory_loc) # cog_href)
         item.save_object(dest_href=destination)
 
         return None
