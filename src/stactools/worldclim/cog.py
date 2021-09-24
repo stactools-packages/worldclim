@@ -14,7 +14,7 @@ def create_cog(
     """Create COG from a tif
 
     Args:
-        input_path (str): Path to the Natural Resources Canada Land Cover data.
+        input_path (str): Path to World Climate data.
         output_path (str): The path to which the COG will be written.
         raise_on_fail (bool, optional): Whether to raise error on failure.
             Defaults to True.

@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Optional
 import os
 from pystac.extensions.base import PropertiesExtension
 import pytz
 import logging
 import rasterio
 from stactools.worldclim import constants
-from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION, WORLDCLIM_CRS,
+from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION,
                                            WORLDCLIM_ID, WORLDCLIM_EPSG,
                                            WORLDCLIM_TITLE, DESCRIPTION,
                                            WORLDCLIM_PROVIDER, LICENSE,
@@ -140,8 +141,7 @@ def create_monthly_collection() -> Collection:
     ProjectionExtension({
         "proj:epsg": WORLDCLIM_EPSG,
         "proj:wkt2": "World Geodetic System 1984",
-        "proj:projjson": WORLDCLIM_CRS,
-        "proj:bbox": [-180, 90, 180, -90],
+        "proj:bbox": [-180., 90., 180., -90.],
         "proj:centroid": [0, 0],
         'proj:shape': [4320, 8640],
         "proj:transform": [-180, 360, 0, 90, 0, 180]
@@ -159,6 +159,7 @@ def create_monthly_collection() -> Collection:
 def create_monthly_item(resolution_href: str,
                         month_href: str,
                         directory_loc: os.path) -> Item:
+                        # cog_href: Optional[str] = None) -> Item:
 
     """Creates a STAC item for a WorldClim dataset.
 
@@ -220,8 +221,10 @@ def create_monthly_item(resolution_href: str,
                 # get geometry based on ESPG
                 geometry = dataset_worldclim.crs
                 # get bounding box with rastero.bounds
-                bbox = dataset_worldclim.bounds
+                bbox = list(dataset_worldclim.bounds)
                 properties = {"title": title, "description": description}
+                transform = list(dataset_worldclim.transform)
+                shape = [dataset_worldclim.height, dataset_worldclim.width]
 
     # Create item
         item = Item(
@@ -239,6 +242,8 @@ def create_monthly_item(resolution_href: str,
 
         item_projection = ProjectionExtension.ext(item, add_if_missing=True)
         item_projection.epsg = WORLDCLIM_EPSG
+        item_projection.transform = transform
+        item_projection.shape = shape
 
         # tiff_href = "wc2.1_"+resolution_href+"_"+key+"_"+month_href # file structure defined above
         tiff_file_path = open(tiff_file_path)
@@ -485,7 +490,6 @@ def create_bioclim_collection() -> Collection:
     ProjectionExtension({
         "proj:epsg": WORLDCLIM_EPSG,
         "proj:wkt2": "World Geodetic System 1984",
-        "proj:projjson": WORLDCLIM_CRS,
         "proj:bbox": [-180, 90, 180, -90],
         "proj:centroid": [0, 0],
         'proj:shape': [4320, 8640],
