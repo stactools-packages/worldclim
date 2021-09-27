@@ -1,17 +1,21 @@
 from datetime import datetime
-# from typing import Optional
 import os
-from typing import Optional
 from pystac.extensions.base import PropertiesExtension
 import pytz
 import logging
 import rasterio
-from stactools.worldclim import constants
-from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION, WORLDCLIM_ID,
-                                           WORLDCLIM_EPSG, WORLDCLIM_TITLE,
-                                           DESCRIPTION, WORLDCLIM_PROVIDER,
-                                           LICENSE, LICENSE_LINK,
-                                           WORLDCLIM_FTP_bioclim)
+
+from stactools.worldclim.constants import (
+    BIOCLIM_DESCRIPTION,
+    WORLDCLIM_ID,
+    WORLDCLIM_EPSG,
+    WORLDCLIM_TITLE,
+    DESCRIPTION,
+    WORLDCLIM_PROVIDER,
+    LICENSE,
+    LICENSE_LINK,
+    WORLDCLIM_FTP_bioclim,
+)
 
 import pystac
 from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
@@ -167,8 +171,8 @@ def create_monthly_item(resolution_href: str, month_href: str,
     # data organized in folders by month (need function to do this),
     # # search for res and variable in filename
 
-    title = constants.WORLDCLIM_TITLE
-    description = constants.DESCRIPTION
+    title = WORLDCLIM_TITLE
+    description = DESCRIPTION
 
     # example filename = "wc2.1_30s_tmin_01.tif"
     variables_dict = {
@@ -476,7 +480,7 @@ def create_bioclim_collection() -> Collection:
         "properties": None,
         "version": "2.1",
         "title": "WorldClim version 2.1",
-        "description": constants.DESCRIPTION,
+        "description": DESCRIPTION,
         # "datetime": dataset_datetime
     }),
     ProjectionExtension({
@@ -506,7 +510,7 @@ def create_bioclim_item(resolution_href: str, directory_loc: os.path) -> Item:
     # assets = bioclim variables
 
     title = 'Worldclim Bioclimatic Variables'
-    description = constants.BIOCLIM_DESCRIPTION
+    description = BIOCLIM_DESCRIPTION
 
     bioclim_variables_dict = {
         "bio_1": "Annual Mean Temperature",
