@@ -1,16 +1,16 @@
 from datetime import datetime
-from typing import Optional
+# from typing import Optional
 import os
 from pystac.extensions.base import PropertiesExtension
 import pytz
 import logging
 import rasterio
 from stactools.worldclim import constants
-from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION,
-                                           WORLDCLIM_ID, WORLDCLIM_EPSG,
-                                           WORLDCLIM_TITLE, DESCRIPTION,
-                                           WORLDCLIM_PROVIDER, LICENSE,
-                                           LICENSE_LINK, WORLDCLIM_FTP_bioclim)
+from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION, WORLDCLIM_ID,
+                                           WORLDCLIM_EPSG, WORLDCLIM_TITLE,
+                                           DESCRIPTION, WORLDCLIM_PROVIDER,
+                                           LICENSE, LICENSE_LINK,
+                                           WORLDCLIM_FTP_bioclim)
 
 import pystac
 from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
@@ -34,11 +34,11 @@ def create_monthly_collection() -> Collection:
     end_year = "2000"
 
     start_datestring = start_year
-    start_datetime = utc.localize(datetime.strptime(start_datestring, "%Y%"))
+    start_datetime = utc.localize(datetime.strptime(start_datestring, "%Y"))
     print(start_datetime)
 
     end_datestring = end_year
-    end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y%"))
+    end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y"))
     print(end_datetime)
 
     bbox = [-180., 90., 180., -90.]
@@ -52,7 +52,17 @@ def create_monthly_collection() -> Collection:
                                 SpatialExtent([bbox]),
                                 TemporalExtent([[start_datetime,
                                                  end_datetime]])),
-                            catalog_type=CatalogType.RELATIVE_PUBLISHED),
+                            catalog_type=CatalogType.RELATIVE_PUBLISHED)
+
+    collection.add_link(LICENSE_LINK)
+
+    collection_proj = ProjectionExtension.ext(collection, add_if_missing=True)
+    collection_proj.epsg = [WORLDCLIM_EPSG],
+    collection_proj.wkt2 = "World Geodetic System 1984",
+    collection_proj.bbox = [-180., 90., 180., -90.],
+    collection_proj.centroid = [0., 0.],
+    collection_proj.shape = [4320, 8640],
+    collection_proj.transform = [-180, 360, 0, 90, 0, 180]
 
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
 
@@ -113,8 +123,8 @@ def create_monthly_collection() -> Collection:
             "roles": ["data"],
             "description":
             "TIFF containing water vapor pressure information "
-        })
-    },
+        }),
+    }
     ScientificExtension({
         "sci:doi":
         "https://doi.org/10.1002/joc.5086",
@@ -137,17 +147,7 @@ def create_monthly_collection() -> Collection:
         "title": "WorldClim version 2.1",
         "description": constants.DESCRIPTION,
         # "datetime": dataset_datetime
-    }),
-    ProjectionExtension({
-        "proj:epsg": WORLDCLIM_EPSG,
-        "proj:wkt2": "World Geodetic System 1984",
-        "proj:bbox": [-180., 90., 180., -90.],
-        "proj:centroid": [0, 0],
-        'proj:shape': [4320, 8640],
-        "proj:transform": [-180, 360, 0, 90, 0, 180]
-    }),
-
-    collection.add_link(LICENSE_LINK)
+    })
 
     return collection
 
@@ -156,11 +156,9 @@ def create_monthly_collection() -> Collection:
 # # directory where the dataset has been downloaded
 
 
-def create_monthly_item(resolution_href: str,
-                        month_href: str,
-                        directory_loc: os.path) -> Item:
-                        # cog_href: Optional[str] = None) -> Item:
-
+def create_monthly_item(resolution_href: str, month_href: str,
+                        directory_loc: str) -> Item:
+    # cog_href: Optional[str] = None) -> Item:
     """Creates a STAC item for a WorldClim dataset.
 
     Args:
@@ -291,7 +289,7 @@ def create_bioclim_collection() -> Collection:
     end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y%"))
     print(end_datetime)
 
-    bbox = [-180, 90, 180, -90]
+    bbox = [-180., 90., 180., -90.]
 
     collection = pystac.Collection(
         id=WORLDCLIM_ID,
@@ -300,9 +298,11 @@ def create_bioclim_collection() -> Collection:
         providers=[WORLDCLIM_PROVIDER[WORLDCLIM_FTP_bioclim]],
         license=LICENSE,
         extent=pystac.Extent(
-            pystac.SpatialExtent(bbox),
-            pystac.TemporalExtent([start_datetime, end_datetime])),
-        catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED),
+            pystac.SpatialExtent([bbox]),
+            pystac.TemporalExtent([[start_datetime, end_datetime]])),
+        catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED)
+
+    collection.add_link(LICENSE_LINK)
 
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
 
@@ -496,14 +496,11 @@ def create_bioclim_collection() -> Collection:
         "proj:transform": [-180, 360, 0, 90, 0, 180]
     })
 
-    collection.add_link(LICENSE_LINK)
-
     return collection
 
 
 # create items for bioclim variables
-def create_bioclim_item(resolution_href: str,
-                        directory_loc: os.path) -> Item:
+def create_bioclim_item(resolution_href: str, directory_loc: os.path) -> Item:
     """Creates a STAC item for a WorldClim Bioclimatic dataset.
 
     Args:
