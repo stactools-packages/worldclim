@@ -6,7 +6,8 @@ from pystac import Link
 from pystac.provider import ProviderRole
 
 WORLDCLIM_ID = "world-clim"
-WORLDCLIM_EPSG = 4326  # to find  from a tiff file: gdalinfo file_path
+WORLDCLIM_VERSION = 2.1
+WORLDCLIM_EPSG = 4326
 WORLDCLIM_CRS = CRS.from_epsg(WORLDCLIM_EPSG)
 WORLDCLIM_TITLE = "Historical climate data"
 LICENSE = "CC-BY-SA-4.0"
@@ -26,6 +27,12 @@ INSTRUMENT = """ Weather station data from between 9000 and 60 000 weather sta
 using thin-plate splines with covariates including elevation, distance to the coast and three
 satellite- derived covariates: maximum and minimum land surface temperature as well as cloud cover,
 obtained with the MODIS satellite platform"""
+
+START_YEAR = 1970
+END_YEAR = 2000
+
+DATASET_URL_MAIN = "https://biogeo.ucdavis.edu/data/worldclim"
+DATASET_URL_TEMPLATE = f"{DATASET_URL_MAIN}/v{WORLDCLIM_VERSION}/base/wc{WORLDCLIM_VERSION}_{{resolution}}_{{variable}}.zip"  # noqa E501
 
 WORLDCLIM_PROVIDER = Provider(
     name="WorldClim",
@@ -107,3 +114,13 @@ precipitation) seasonality (e.g., annual range in temperature and precipitation)
 or limiting environmental factors (e.g., temperature of the coldest and warmest month, and
 precipitation of the wet and dry quarters). A quarter is a period of three months
 (1/4 of the year)."""
+
+DATA_VARIABLES = {
+    "tmin": "Minimum Temperature (°C)",
+    "tmax": "Maximum Temperature (°C)",
+    "tavg": "Average Temperature (°C)",
+    "prec": "Precipitation (mm)",
+    "srad": "Solar Radiation (kJ m-2 day-1)",
+    "wind": "Wind Speed (m s-1)",
+    "vapr": "Water Vapor Pressure (kPa)"
+}

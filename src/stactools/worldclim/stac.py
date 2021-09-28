@@ -1,18 +1,31 @@
-from datetime import datetime
-# from typing import Optional
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+import calendar
 import os
 from pystac.extensions.base import PropertiesExtension
 import pytz
 import logging
 import rasterio
-from stactools.worldclim import constants
-from stactools.worldclim.constants import (BIOCLIM_DESCRIPTION, WORLDCLIM_ID,
-                                           WORLDCLIM_EPSG, WORLDCLIM_TITLE,
-                                           DESCRIPTION, WORLDCLIM_PROVIDER,
-                                           LICENSE, LICENSE_LINK,
-                                           WORLDCLIM_FTP_bioclim)
+
+from stactools.worldclim.constants import (
+    BIOCLIM_DESCRIPTION,
+    DATA_VARIABLES,
+    WORLDCLIM_ID,
+    WORLDCLIM_EPSG,
+    WORLDCLIM_TITLE,
+    DESCRIPTION,
+    WORLDCLIM_PROVIDER,
+    LICENSE,
+    LICENSE_LINK,
+    START_YEAR,
+    END_YEAR,
+    WORLDCLIM_FTP_bioclim,
+    WORLDCLIM_VERSION,
+)
 
 import pystac
+import shapely
+
 from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
                     CatalogType, MediaType, Item)
 
@@ -21,6 +34,9 @@ from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.version import VersionExtension
 from pystac.extensions.item_assets import AssetDefinition
 from pystac.extensions.item_assets import ItemAssetsExtension
+from stactools.core.io import ReadHrefModifier
+
+from stactools.worldclim.enum import Month, Resolution
 
 logger = logging.getLogger(__name__)
 
@@ -143,20 +159,21 @@ def create_monthly_collection() -> Collection:
 
     return collection
 
-
-# directory_loc = "/Users/cpapalaz/Documents/climate_data"
-# # directory where the dataset has been downloaded
-
-
-def create_monthly_item(resolution_href: str, month_href: str,
-                        directory_loc: str) -> Item:
-    # cog_href: Optional[str] = None) -> Item:
+def create_monthly_item(
+    resolution: Resolution,
+    month: Month,
+    destination: str,
+    cog_dir_href: str,
+    cog_href_modifier: Optional[ReadHrefModifier] = None,
+) -> Item:
     """Creates a STAC item for a WorldClim dataset.
 
     Args:
-        resolution_href (str): Desired item resolution
-        month_href (str): Desired item month
-        directory_loc (os.path) : Local path to dataset
+        resolution (Resolution): Desired item resolution
+        month (Month): Desired item month
+        destination (str): Destination directory
+        cog_dir_href (str): Directory containing COGs
+        cog_href_modifier (ReadHrefModifier, optional): Funtion to apply to the cog_dir_href
 
     Returns:
         pystac.Item: STAC Item object.
@@ -167,98 +184,91 @@ def create_monthly_item(resolution_href: str, month_href: str,
     # data organized in folders by month (need function to do this),
     # # search for res and variable in filename
 
-    title = constants.WORLDCLIM_TITLE
-    description = constants.DESCRIPTION
-
     # example filename = "wc2.1_30s_tmin_01.tif"
-    variables_dict = {
-        "tmin": "Minimum Temperature (°C)",
-        "tmax": "Maximum Temperature (°C)",
-        "tavg": "Average Temperature (°C)",
-        "prec": "Precipitation (mm)",
-        "srad": "Solar Radiation (kJ m-2 day-1)",
-        "wind": "Wind Speed (m s-1)",
-        "vapr": "Water Vapor Pressure (kPa)"
-    }
 
-    for key in variables_dict.keys():
-        # file structure
-        tiff_href = "wc2.1_" + resolution_href + "_" + key + "_" + month_href + ".tif"
-        print(tiff_href)
+    item = None
+    for (data_var, data_var_desc) in DATA_VARIABLES.items():
+        tiff_file_name = f"wc{WORLDCLIM_VERSION}_{resolution.value}_{data_var}_{month.value:02d}.tif"  # noqa E501
+        cog_href = os.path.join(cog_dir_href, tiff_file_name)
+        if cog_href_modifier:
+            cog_access_href = cog_href_modifier(cog_href)
+        else:
+            cog_access_href = cog_href
 
-        utc = pytz.utc
-        # month extracts the string after the last underscore and before the last period
-        # month = os.path.splitext(tiff_href)[0].split("_")[-1]  # sort based on this
-        start_year = "1970"
-        end_year = "2000"
-
-        start_datestring = f"{month_href}_{start_year}"
-        start_datetime = utc.localize(
-            datetime.strptime(start_datestring, "%m_%Y"))
-        print(start_datetime)
-
-        end_datestring = f"{int(month_href) + 1}_{end_year}"
-        end_datetime = utc.localize(datetime.strptime(end_datestring, "%m_%Y"))
-        print(end_datetime)
-
-        tiff_file_path = directory_loc + "/" + month_href + "/" + tiff_href
-        print(tiff_file_path)
+        start_datetime = datetime(
+            START_YEAR,
+            month.value,
+            1,
+            tzinfo=timezone.utc,
+        )
+        end_datetime = datetime(
+            END_YEAR,
+            month.value + 1,
+            1,
+            tzinfo=timezone.utc,
+        ) - timedelta(seconds=1)
 
         # use rasterio to open tiff file
-        if tiff_file_path is not None:
-            with rasterio.open(tiff_file_path) as dataset_worldclim:
-                id = title.replace(" ", "-")
-                # get geometry based on ESPG
-                geometry = dataset_worldclim.crs
-                # get bounding box with rastero.bounds
-                bbox = list(dataset_worldclim.bounds)
-                properties = {"title": title, "description": description}
-                transform = list(dataset_worldclim.transform)
-                shape = [dataset_worldclim.height, dataset_worldclim.width]
+        with rasterio.open(cog_access_href) as dataset:
+            bbox = list(dataset.bounds)
+            geometry = shapely.geometry.mapping(
+                shapely.geometry.box(*bbox, ccw=True))
+            transform = list(dataset.transform)
+            shape = [dataset.height, dataset.width]
 
-    # Create item
-        item = Item(
-            id=id,
-            geometry=geometry,
-            bbox=bbox,
-            datetime=start_datetime,
-            properties=properties,
-            stac_extensions=[],
+        if item is None:
+            # Create item
+            id = f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value}"
+            properties = {
+                "title":
+                f"Worldclim {resolution.value} {calendar.month_name[month.value]}",
+                "description": DESCRIPTION,
+            }
+            item = Item(
+                id=id,
+                geometry=geometry,
+                bbox=bbox,
+                datetime=start_datetime,
+                properties=properties,
+                stac_extensions=[],
+            )
+
+            if start_datetime and end_datetime:
+                item.common_metadata.start_datetime = start_datetime
+                item.common_metadata.end_datetime = end_datetime
+
+            item_projection = ProjectionExtension.ext(item,
+                                                      add_if_missing=True)
+            item_projection.epsg = WORLDCLIM_EPSG
+            item_projection.bbox = bbox
+            item_projection.transform = transform
+            item_projection.shape = shape
+
+        cog_asset = Asset(
+            href=cog_href,
+            media_type=MediaType.TIFF,
+            roles=["data"],
+            title=data_var_desc,
+        )
+        item.add_asset(
+            data_var,
+            cog_asset,
         )
 
-        if start_datetime and end_datetime:
-            item.common_metadata.start_datetime = start_datetime
-            item.common_metadata.end_datetime = end_datetime
+        # Include projection information on Asset
+        cog_asset_proj = ProjectionExtension.ext(cog_asset,
+                                                 add_if_missing=True)
+        cog_asset_proj.epsg = item_projection.epsg
+        cog_asset_proj.transform = item_projection.transform
+        cog_asset_proj.bbox = item_projection.bbox
+        cog_asset_proj.shape = item_projection.shape
 
-        item_projection = ProjectionExtension.ext(item, add_if_missing=True)
-        item_projection.epsg = WORLDCLIM_EPSG
-        item_projection.transform = transform
-        item_projection.shape = shape
-
-        # tiff_href = "wc2.1_"+resolution_href+"_"+key+"_"+month_href # file structure defined above
-        tiff_file_path = open(tiff_file_path)
-
-        # Create asset based on keys in variables_dict
-        item.add_asset(
-            key,
-            Asset(
-                href=tiff_file_path,
-                media_type=MediaType.TIFF,
-                roles=["data"],
-                title=variables_dict[key],
-            ))
-
-        tiff_file_path.close()
-
-# Include projection information
-    proj_ext = ProjectionExtension.ext(item, add_if_missing=True)
-    proj_ext.epsg = item_projection.epsg
-    proj_ext.transform = item_projection.transform
-    proj_ext.bbox = item_projection.bbox
-    proj_ext.wkt2 = item_projection.wkt2
-    proj_ext.shape = item_projection.shape
-    proj_ext.centroid = item_projection.centroid
-
+    assert (item is not None)
+    item.set_self_href(
+        os.path.join(
+            destination,
+            f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value:02d}.json")
+    )
     return item
 
 
@@ -476,7 +486,7 @@ def create_bioclim_collection() -> Collection:
         "properties": None,
         "version": "2.1",
         "title": "WorldClim version 2.1",
-        "description": constants.DESCRIPTION,
+        "description": DESCRIPTION,
         # "datetime": dataset_datetime
     }),
     ProjectionExtension({
@@ -506,7 +516,7 @@ def create_bioclim_item(resolution_href: str, directory_loc: os.path) -> Item:
     # assets = bioclim variables
 
     title = 'Worldclim Bioclimatic Variables'
-    description = constants.BIOCLIM_DESCRIPTION
+    description = BIOCLIM_DESCRIPTION
 
     bioclim_variables_dict = {
         "bio_1": "Annual Mean Temperature",

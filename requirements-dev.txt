@@ -12,4 +12,5 @@ sphinxcontrib-fulltoc
 sphinxcontrib-napoleon
 types-click
 types-pytz
+types-requests
 yapf
