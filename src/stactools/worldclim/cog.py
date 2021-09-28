@@ -2,7 +2,43 @@ import logging
 
 from subprocess import CalledProcessError, check_output
 
+import os
+import requests
+
+from io import BytesIO
+from glob import glob
+from tempfile import TemporaryDirectory
+from zipfile import ZipFile
+
+from stactools.worldclim.constants import DATA_VARIABLES, DATASET_URL_TEMPLATE
+from stactools.worldclim.enum import Resolution
+
 logger = logging.getLogger(__name__)
+
+
+def download_convert_dataset(output_path: str) -> None:
+    with TemporaryDirectory() as tmp_dir:
+        download_dataset(tmp_dir)
+        convert_dataset(tmp_dir, output_path)
+
+
+def download_dataset(output_path: str) -> None:
+    for res in Resolution:
+        res_path = os.path.join(output_path, res.value)
+        os.mkdir(res_path)
+        for v in DATA_VARIABLES.keys():
+            var_path = os.path.join(res_path, v)
+            os.mkdir(var_path)
+            url = DATASET_URL_TEMPLATE.format(resolution=res.value, variable=v)
+            response = requests.get(url)
+            zipfile = ZipFile(BytesIO(response.content))
+            zipfile.extractall(path=var_path)
+
+
+def convert_dataset(input_path: str, output_path: str) -> None:
+    for file_name in glob(f"{input_path}/**/*.tif", recursive=True):
+        out_file_name = os.path.join(output_path, os.path.basename(file_name))
+        create_cog(file_name, out_file_name)
 
 
 def create_cog(
@@ -36,11 +72,15 @@ def create_cog(
                 "-of",
                 "COG",
                 "-co",
+                "NUM_THREADS=ALL_CPUS",
+                "-co",
                 "BLOCKSIZE=512",
                 "-co",
-                "compress=deflate",
+                "COMPRESS=DEFLATE",
                 "-co",
-                "predictor=yes",
+                "LEVEL=9",
+                "-co",
+                "PREDICTOR=YES",
                 "-co",
                 "OVERVIEWS=IGNORE_EXISTING",
                 input_path,
