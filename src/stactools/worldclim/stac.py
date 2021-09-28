@@ -1,7 +1,6 @@
 from datetime import datetime
 # from typing import Optional
 import os
-from typing import Optional
 from pystac.extensions.base import PropertiesExtension
 import pytz
 import logging
@@ -58,18 +57,19 @@ def create_monthly_collection() -> Collection:
 
     collection.add_link(LICENSE_LINK)
 
-    # projection extension
-    collection_proj = ProjectionExtension.ext(collection, add_if_missing=True)
-    collection_proj.epsg = [WORLDCLIM_EPSG],
-    collection_proj.wkt2 = "World Geodetic System 1984",
-    collection_proj.bbox = [-180., 90., 180., -90.],
-    collection_proj.centroid = [0., 0.],
-    collection_proj.shape = [4320, 8640],
-    collection_proj.transform = [-180., 360., 0., 90., 0., 180.],
+    # # projection extension
+    # collection_proj = ProjectionExtension.ext(collection, add_if_missing=True)
+    # collection_proj.epsg = [WORLDCLIM_EPSG],
+    # collection_proj.wkt2 = "World Geodetic System 1984",
+    # collection_proj.bbox = [-180., 90., 180., -90.],
+    # collection_proj.centroid = [0., 0.],
+    # collection_proj.shape = [4320, 8640],
+    # collection_proj.transform = [-180., 360., 0., 90., 0., 180.],
 
     # collection version
     collection_version = VersionExtension.ext(collection, add_if_missing=True)
-    collection_version.latest = "WorldClim version 2.1",
+    collection_version.latest = "https://worldclim.org/data/worldclim21.html",
+    collection_version.predecessor = "https://worldclim.org/data/v1.4/worldclim14.html"
 
     # collection scientific extension
     sci_ext = ScientificExtension.ext(collection, add_if_missing=True)
@@ -138,7 +138,7 @@ def create_monthly_collection() -> Collection:
             "roles": ["data"],
             "description":
             "TIFF containing water vapor pressure information "
-        }),
+        })
     }
 
     return collection
@@ -472,7 +472,7 @@ def create_bioclim_collection() -> Collection:
         """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces
         for global land areas. International Journal of Climatology 37 (12): 4302-4315."""
     }),
-    PropertiesExtension({
+    PropertiesExtension({ # version
         "properties": None,
         "version": "2.1",
         "title": "WorldClim version 2.1",
