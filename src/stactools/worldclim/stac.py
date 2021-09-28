@@ -22,7 +22,7 @@ from stactools.worldclim.constants import (
     END_YEAR,
     WORLDCLIM_FTP_bioclim,
     WORLDCLIM_VERSION,
-    DOI
+    DOI,
 )
 
 import pystac
@@ -152,6 +152,7 @@ def create_monthly_collection() -> Collection:
     }
 
     return collection
+
 
 def create_monthly_item(
     resolution: Resolution,
@@ -482,7 +483,7 @@ def create_bioclim_collection() -> Collection:
         """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces
         for global land areas. International Journal of Climatology 37 (12): 4302-4315."""
     }),
-    PropertiesExtension({ # version
+    PropertiesExtension({  # version
         "properties": None,
         "version": "2.1",
         "title": "WorldClim version 2.1",

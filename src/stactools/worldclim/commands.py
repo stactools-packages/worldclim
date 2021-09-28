@@ -52,7 +52,6 @@ def create_worldclim_command(cli):
 
         return None
 
-
     @worldclim.command(
         "create-monthly-item",
         short_help="Create a monthly STAC item",
