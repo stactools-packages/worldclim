@@ -28,7 +28,7 @@ using thin-plate splines with covariates including elevation, distance to the co
 satellite- derived covariates: maximum and minimum land surface temperature as well as cloud cover,
 obtained with the MODIS satellite platform"""
 
-DOI = "10.1002/joc.5086" # https://doi.org/10.1002/joc.5086
+DOI = "10.1002/joc.5086"  # https://doi.org/10.1002/joc.5086
 CITATION = """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
         resolution climate surfaces for global land areas. International
         Journal of Climatology 37 (12): 4302-4315."""
