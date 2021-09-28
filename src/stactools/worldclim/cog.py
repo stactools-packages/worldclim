@@ -10,7 +10,7 @@ from glob import glob
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
-from stactools.worldclim.constants import DATA_VARIABLES, DATASET_URL_TEMPLATE
+from stactools.worldclim.constants import MONTHLY_DATA_VARIABLES, DATASET_URL_TEMPLATE
 from stactools.worldclim.enum import Resolution
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def download_dataset(output_path: str) -> None:
     for res in Resolution:
         res_path = os.path.join(output_path, res.value)
         os.mkdir(res_path)
-        for v in DATA_VARIABLES.keys():
+        for v in MONTHLY_DATA_VARIABLES.keys():
             var_path = os.path.join(res_path, v)
             os.mkdir(var_path)
             url = DATASET_URL_TEMPLATE.format(resolution=res.value, variable=v)

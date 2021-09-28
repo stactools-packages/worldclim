@@ -28,6 +28,11 @@ using thin-plate splines with covariates including elevation, distance to the co
 satellite- derived covariates: maximum and minimum land surface temperature as well as cloud cover,
 obtained with the MODIS satellite platform"""
 
+DOI = "10.1002/joc.5086" # https://doi.org/10.1002/joc.5086
+CITATION = """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
+        resolution climate surfaces for global land areas. International
+        Journal of Climatology 37 (12): 4302-4315."""
+
 START_YEAR = 1970
 END_YEAR = 2000
 
@@ -115,12 +120,14 @@ or limiting environmental factors (e.g., temperature of the coldest and warmest 
 precipitation of the wet and dry quarters). A quarter is a period of three months
 (1/4 of the year)."""
 
-DATA_VARIABLES = {
-    "tmin": "Minimum Temperature (°C)",
-    "tmax": "Maximum Temperature (°C)",
-    "tavg": "Average Temperature (°C)",
+MONTHLY_DATA_VARIABLES = {
+    "tmin": "Minimum Temperature (degrees C)",
+    "tmax": "Maximum Temperature (degrees C)",
+    "tavg": "Average Temperature (degrees C)",
     "prec": "Precipitation (mm)",
     "srad": "Solar Radiation (kJ m-2 day-1)",
     "wind": "Wind Speed (m s-1)",
     "vapr": "Water Vapor Pressure (kPa)"
 }
+
+BIOCLIM_VARIABLES = {}

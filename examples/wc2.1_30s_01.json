@@ -1,0 +1,289 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "wc2.1_30s_1",
+  "properties": {
+    "title": "Worldclim 30s January",
+    "description": "This is WorldClim version 2.1 climate data for 1970-2000. This version was\nreleased in January 2020. There are monthly climate data for minimum, mean, and maximum temperature,\nprecipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There\nare also 19 \u201cbioclimatic\u201d variables. The data is available at the four spatial resolutions, between\n30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a \u201czip\u201d file containing 12 GeoTiff\n(.tif) files, one for each month of the year (January is 1; December is 12).",
+    "start_datetime": "1970-01-01T00:00:00Z",
+    "end_datetime": "2000-01-31T23:59:59Z",
+    "proj:epsg": 4326,
+    "proj:bbox": [
+      -180.0,
+      -90.0,
+      180.0,
+      90.0
+    ],
+    "proj:transform": [
+      0.008333333333333333,
+      0.0,
+      -180.0,
+      0.0,
+      -0.008333333333333333,
+      90.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "proj:shape": [
+      21600,
+      43200
+    ],
+    "datetime": "1970-01-01T00:00:00Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          180.0,
+          -90.0
+        ],
+        [
+          180.0,
+          90.0
+        ],
+        [
+          -180.0,
+          90.0
+        ],
+        [
+          -180.0,
+          -90.0
+        ],
+        [
+          180.0,
+          -90.0
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "/Users/cpapalaz/Documents/worldclim/newitem.json/wc2.1_30s_01.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "tmin": {
+      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tmin_01.tif",
+      "type": "image/tiff",
+      "title": "Minimum Temperature (\u00b0C)",
+      "proj:epsg": 4326,
+      "proj:transform": [
+        0.008333333333333333,
+        0.0,
+        -180.0,
+        0.0,
+        -0.008333333333333333,
+        90.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:bbox": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "proj:shape": [
+        21600,
+        43200
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tmax": {
+      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tmax_01.tif",
+      "type": "image/tiff",
+      "title": "Maximum Temperature (\u00b0C)",
+      "proj:epsg": 4326,
+      "proj:transform": [
+        0.008333333333333333,
+        0.0,
+        -180.0,
+        0.0,
+        -0.008333333333333333,
+        90.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:bbox": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "proj:shape": [
+        21600,
+        43200
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tavg": {
+      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_01.tif",
+      "type": "image/tiff",
+      "title": "Average Temperature (\u00b0C)",
+      "proj:epsg": 4326,
+      "proj:transform": [
+        0.008333333333333333,
+        0.0,
+        -180.0,
+        0.0,
+        -0.008333333333333333,
+        90.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:bbox": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "proj:shape": [
+        21600,
+        43200
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "prec": {
+      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_prec_01.tif",
+      "type": "image/tiff",
+      "title": "Precipitation (mm)",
+      "proj:epsg": 4326,
+      "proj:transform": [
+        0.008333333333333333,
+        0.0,
+        -180.0,
+        0.0,
+        -0.008333333333333333,
+        90.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:bbox": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "proj:shape": [
+        21600,
+        43200
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "srad": {
+      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_srad_01.tif",
+      "type": "image/tiff",
+      "title": "Solar Radiation (kJ m-2 day-1)",
+      "proj:epsg": 4326,
+      "proj:transform": [
+        0.008333333333333333,
+        0.0,
+        -180.0,
+        0.0,
+        -0.008333333333333333,
+        90.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:bbox": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "proj:shape": [
+        21600,
+        43200
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "wind": {
+      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_wind_01.tif",
+      "type": "image/tiff",
+      "title": "Wind Speed (m s-1)",
+      "proj:epsg": 4326,
+      "proj:transform": [
+        0.008333333333333333,
+        0.0,
+        -180.0,
+        0.0,
+        -0.008333333333333333,
+        90.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:bbox": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "proj:shape": [
+        21600,
+        43200
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "vapr": {
+      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_vapr_01.tif",
+      "type": "image/tiff",
+      "title": "Water Vapor Pressure (kPa)",
+      "proj:epsg": 4326,
+      "proj:transform": [
+        0.008333333333333333,
+        0.0,
+        -180.0,
+        0.0,
+        -0.008333333333333333,
+        90.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:bbox": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "proj:shape": [
+        21600,
+        43200
+      ],
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "bbox": [
+    -180.0,
+    -90.0,
+    180.0,
+    90.0
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+  ]
+}

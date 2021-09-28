@@ -9,7 +9,8 @@ import rasterio
 
 from stactools.worldclim.constants import (
     BIOCLIM_DESCRIPTION,
-    DATA_VARIABLES,
+    CITATION,
+    MONTHLY_DATA_VARIABLES,
     WORLDCLIM_ID,
     WORLDCLIM_EPSG,
     WORLDCLIM_TITLE,
@@ -21,6 +22,7 @@ from stactools.worldclim.constants import (
     END_YEAR,
     WORLDCLIM_FTP_bioclim,
     WORLDCLIM_VERSION,
+    DOI
 )
 
 import pystac
@@ -73,27 +75,19 @@ def create_monthly_collection() -> Collection:
 
     collection.add_link(LICENSE_LINK)
 
-    # # projection extension
+    # projection extension
     # collection_proj = ProjectionExtension.ext(collection, add_if_missing=True)
     # collection_proj.epsg = [WORLDCLIM_EPSG],
     # collection_proj.wkt2 = "World Geodetic System 1984",
     # collection_proj.bbox = [-180., 90., 180., -90.],
     # collection_proj.centroid = [0., 0.],
     # collection_proj.shape = [4320, 8640],
-    # collection_proj.transform = [-180., 360., 0., 90., 0., 180.],
+    # collection_proj.transform = [-180., 360., 0., 90., 0., 180.]
 
     # collection version
     collection_version = VersionExtension.ext(collection, add_if_missing=True)
     collection_version.latest = "https://worldclim.org/data/worldclim21.html",
     collection_version.predecessor = "https://worldclim.org/data/v1.4/worldclim14.html"
-
-    # collection scientific extension
-    sci_ext = ScientificExtension.ext(collection, add_if_missing=True)
-    sci_ext.doi = "https://doi.org/10.1002/joc.5086",
-    sci_ext.citation = """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
-        resolution climate surfaces for global land areas. International
-        Journal of Climatology 37 (12): 4302-4315.""",
-    sci_ext.publications = None,
 
     # item assets extension
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
@@ -187,7 +181,7 @@ def create_monthly_item(
     # example filename = "wc2.1_30s_tmin_01.tif"
 
     item = None
-    for (data_var, data_var_desc) in DATA_VARIABLES.items():
+    for (data_var, data_var_desc) in MONTHLY_DATA_VARIABLES.items():
         tiff_file_name = f"wc{WORLDCLIM_VERSION}_{resolution.value}_{data_var}_{month.value:02d}.tif"  # noqa E501
         cog_href = os.path.join(cog_dir_href, tiff_file_name)
         if cog_href_modifier:
@@ -269,6 +263,12 @@ def create_monthly_item(
             destination,
             f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value:02d}.json")
     )
+
+    # collection scientific extension
+    sci_ext = ScientificExtension.ext(item, add_if_missing=True)
+    sci_ext.doi = DOI,
+    sci_ext.citation = CITATION,
+
     return item
 
 

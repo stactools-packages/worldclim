@@ -45,4 +45,4 @@ cog.create_cog("/path/to/local.tif", "/path/to/cog.tif")
 stac.create_item(metadata, "/path/to/item.json", "/path/to/cog.tif")
 
 # Create a monthly STAC Item
-stac worldclim create-monthly-item newitem.json resolution month /path/to/tiff/on/local/machine.tif
+scripts/stac worldclim create-monthly-item -d newitem.json -r resolution -m month -c /path/to/tiffs/on/local/machine/
