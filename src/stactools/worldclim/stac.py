@@ -89,6 +89,11 @@ def create_monthly_collection() -> Collection:
     collection_version.latest = "https://worldclim.org/data/worldclim21.html",
     collection_version.predecessor = "https://worldclim.org/data/v1.4/worldclim14.html"
 
+    # item scientific extension
+    sci_ext = ScientificExtension.ext(collection, add_if_missing=True)
+    sci_ext.doi = DOI,
+    sci_ext.citation = CITATION,
+
     # item assets extension
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
     # for each month (item) assets are defined below.
@@ -264,7 +269,7 @@ def create_monthly_item(
             f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value:02d}.json")
     )
 
-    # collection scientific extension
+    # item scientific extension
     sci_ext = ScientificExtension.ext(item, add_if_missing=True)
     sci_ext.doi = DOI,
     sci_ext.citation = CITATION,
