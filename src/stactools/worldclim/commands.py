@@ -1,4 +1,5 @@
 import logging
+import os
 
 import click
 
@@ -39,7 +40,12 @@ def create_worldclim_command(cli):
         "create-monthly-collection",
         short_help="Creates a monthly STAC collection",
     )
-    @click.argument("destination")
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="The output directory for the STAC json",
+    )
     def create_collection_command(destination: str):
         """Creates a STAC Collection
         Args:
@@ -47,9 +53,10 @@ def create_worldclim_command(cli):
         """
         collection = stac.create_monthly_collection()
 
-        collection.set_self_href(destination)
-
+        collection.set_self_href(os.path.join(destination, "collection.json"))
+        collection.normalize_hrefs(destination)
         collection.save_object()
+        collection.validate()
 
         return None
 
