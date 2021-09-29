@@ -45,20 +45,19 @@ logger = logging.getLogger(__name__)
 
 def create_monthly_collection() -> Collection:
     #  Creates a STAC collection for a WorldClim dataset
-    #  need to pass in month data?
 
-    utc = pytz.utc
-
-    start_year = "1970"
-    end_year = "2000"
-
-    start_datestring = start_year
-    start_datetime = utc.localize(datetime.strptime(start_datestring, "%Y"))
-    print(start_datetime)
-
-    end_datestring = end_year
-    end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y"))
-    print(end_datetime)
+    start_datetime = datetime(
+        START_YEAR,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+    end_datetime = datetime(
+        END_YEAR + 1,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    ) - timedelta(seconds=1)  # type: Optional[datetime]
 
     bbox = [-180., 90., 180., -90.]
 
