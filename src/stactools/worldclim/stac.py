@@ -265,10 +265,10 @@ def create_monthly_item(
             f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value:02d}.json")
     )
 
-    # collection scientific extension
+    # scientific extension
     sci_ext = ScientificExtension.ext(item, add_if_missing=True)
-    sci_ext.doi = DOI,
-    sci_ext.citation = CITATION,
+    sci_ext.doi = DOI
+    sci_ext.citation = CITATION
 
     return item
 
