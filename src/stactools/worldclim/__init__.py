@@ -1,7 +1,7 @@
 import stactools.core
 
-from stactools.worldclim.stac import create_monthly_item
 from stactools.worldclim.cog import create_cog
+from stactools.worldclim.stac import create_monthly_item
 
 stactools.core.use_fsspec()
 

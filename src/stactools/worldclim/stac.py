@@ -1,44 +1,47 @@
+import calendar
+import logging
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-import calendar
-import os
-from pystac.extensions.base import PropertiesExtension
+
+import pystac
 import pytz
-import logging
 import rasterio
+import shapely
+from pystac import (
+    Asset,
+    CatalogType,
+    Collection,
+    Extent,
+    Item,
+    MediaType,
+    SpatialExtent,
+    TemporalExtent,
+)
+from pystac.extensions.base import PropertiesExtension
+from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
+from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.scientific import ScientificExtension
+from pystac.extensions.version import VersionExtension
+from stactools.core.io import ReadHrefModifier
 
 from stactools.worldclim.constants import (
     BIOCLIM_DESCRIPTION,
     CITATION,
-    MONTHLY_DATA_VARIABLES,
-    WORLDCLIM_ID,
-    WORLDCLIM_EPSG,
-    WORLDCLIM_CRS_WKT,
-    WORLDCLIM_TITLE,
     DESCRIPTION,
-    WORLDCLIM_PROVIDER,
+    DOI,
+    END_YEAR,
     LICENSE,
     LICENSE_LINK,
+    MONTHLY_DATA_VARIABLES,
     START_YEAR,
-    END_YEAR,
-    WORLDCLIM_FTP_bioclim,
+    WORLDCLIM_CRS_WKT,
+    WORLDCLIM_EPSG,
+    WORLDCLIM_ID,
+    WORLDCLIM_PROVIDER,
+    WORLDCLIM_TITLE,
     WORLDCLIM_VERSION,
-    DOI,
 )
-
-import pystac
-import shapely
-
-from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
-                    CatalogType, MediaType, Item)
-
-from pystac.extensions.projection import ProjectionExtension
-from pystac.extensions.scientific import ScientificExtension
-from pystac.extensions.version import VersionExtension
-from pystac.extensions.item_assets import AssetDefinition
-from pystac.extensions.item_assets import ItemAssetsExtension
-from stactools.core.io import ReadHrefModifier
-
 from stactools.worldclim.enum import Month, Resolution
 
 logger = logging.getLogger(__name__)
