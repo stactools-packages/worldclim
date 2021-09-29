@@ -13,6 +13,7 @@ from stactools.worldclim.constants import (
     MONTHLY_DATA_VARIABLES,
     WORLDCLIM_ID,
     WORLDCLIM_EPSG,
+    WORLDCLIM_CRS_WKT,
     WORLDCLIM_TITLE,
     DESCRIPTION,
     WORLDCLIM_PROVIDER,
@@ -234,6 +235,7 @@ def create_monthly_item(
             item_projection = ProjectionExtension.ext(item,
                                                       add_if_missing=True)
             item_projection.epsg = WORLDCLIM_EPSG
+            item_projection.wkt2 = WORLDCLIM_CRS_WKT
             item_projection.bbox = bbox
             item_projection.transform = transform
             item_projection.shape = shape
@@ -253,6 +255,7 @@ def create_monthly_item(
         cog_asset_proj = ProjectionExtension.ext(cog_asset,
                                                  add_if_missing=True)
         cog_asset_proj.epsg = item_projection.epsg
+        cog_asset_proj.wkt2 = item_projection.wkt2
         cog_asset_proj.transform = item_projection.transform
         cog_asset_proj.bbox = item_projection.bbox
         cog_asset_proj.shape = item_projection.shape
