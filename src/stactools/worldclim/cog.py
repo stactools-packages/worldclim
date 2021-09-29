@@ -1,16 +1,17 @@
 import logging
-
-from subprocess import CalledProcessError, check_output
-
 import os
-import requests
-
-from io import BytesIO
 from glob import glob
+from io import BytesIO
+from subprocess import CalledProcessError, check_output
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
-from stactools.worldclim.constants import MONTHLY_DATA_VARIABLES, DATASET_URL_TEMPLATE
+import requests
+
+from stactools.worldclim.constants import (
+    DATASET_URL_TEMPLATE,
+    MONTHLY_DATA_VARIABLES,
+)
 from stactools.worldclim.enum import Resolution
 
 logger = logging.getLogger(__name__)

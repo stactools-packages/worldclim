@@ -1,43 +1,47 @@
+import calendar
+import logging
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-import calendar
-import os
-from pystac.extensions.base import PropertiesExtension
+
+import pystac
 import pytz
-import logging
 import rasterio
+import shapely
+from pystac import (
+    Asset,
+    CatalogType,
+    Collection,
+    Extent,
+    Item,
+    MediaType,
+    SpatialExtent,
+    TemporalExtent,
+)
+from pystac.extensions.base import PropertiesExtension
+from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
+from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.scientific import ScientificExtension
+from pystac.extensions.version import VersionExtension
+from stactools.core.io import ReadHrefModifier
 
 from stactools.worldclim.constants import (
     BIOCLIM_DESCRIPTION,
     CITATION,
-    MONTHLY_DATA_VARIABLES,
-    WORLDCLIM_ID,
-    WORLDCLIM_EPSG,
-    WORLDCLIM_TITLE,
     DESCRIPTION,
-    WORLDCLIM_PROVIDER,
+    DOI,
+    END_YEAR,
     LICENSE,
     LICENSE_LINK,
+    MONTHLY_DATA_VARIABLES,
     START_YEAR,
-    END_YEAR,
-    WORLDCLIM_FTP_bioclim,
+    WORLDCLIM_CRS_WKT,
+    WORLDCLIM_EPSG,
+    WORLDCLIM_ID,
+    WORLDCLIM_PROVIDER,
+    WORLDCLIM_TITLE,
     WORLDCLIM_VERSION,
-    DOI,
 )
-
-import pystac
-import shapely
-
-from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
-                    CatalogType, MediaType, Item)
-
-from pystac.extensions.projection import (ProjectionExtension)
-from pystac.extensions.scientific import ScientificExtension
-from pystac.extensions.version import VersionExtension
-from pystac.extensions.item_assets import AssetDefinition
-from pystac.extensions.item_assets import ItemAssetsExtension
-from stactools.core.io import ReadHrefModifier
-
 from stactools.worldclim.enum import Month, Resolution
 
 logger = logging.getLogger(__name__)
@@ -45,20 +49,19 @@ logger = logging.getLogger(__name__)
 
 def create_monthly_collection() -> Collection:
     #  Creates a STAC collection for a WorldClim dataset
-    #  need to pass in month data?
 
-    utc = pytz.utc
-
-    start_year = "1970"
-    end_year = "2000"
-
-    start_datestring = start_year
-    start_datetime = utc.localize(datetime.strptime(start_datestring, "%Y"))
-    print(start_datetime)
-
-    end_datestring = end_year
-    end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y"))
-    print(end_datetime)
+    start_datetime = datetime(
+        START_YEAR,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+    end_datetime = datetime(
+        END_YEAR + 1,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    ) - timedelta(seconds=1)  # type: Optional[datetime]
 
     bbox = [-180., 90., 180., -90.]
 
@@ -76,18 +79,13 @@ def create_monthly_collection() -> Collection:
     collection.add_link(LICENSE_LINK)
 
     # projection extension
-    # collection_proj = ProjectionExtension.ext(collection, add_if_missing=True)
-    # collection_proj.epsg = [WORLDCLIM_EPSG],
-    # collection_proj.wkt2 = "World Geodetic System 1984",
-    # collection_proj.bbox = [-180., 90., 180., -90.],
-    # collection_proj.centroid = [0., 0.],
-    # collection_proj.shape = [4320, 8640],
-    # collection_proj.transform = [-180., 360., 0., 90., 0., 180.]
+    collection_proj = ProjectionExtension.summaries(collection,
+                                                    add_if_missing=True)
+    collection_proj.epsg = [WORLDCLIM_EPSG]
 
-    # collection version
+    # version extension
     collection_version = VersionExtension.ext(collection, add_if_missing=True)
-    collection_version.latest = "https://worldclim.org/data/worldclim21.html",
-    collection_version.predecessor = "https://worldclim.org/data/v1.4/worldclim14.html"
+    collection_version.version = str(WORLDCLIM_VERSION)
 
     # item scientific extension
     sci_ext = ScientificExtension.ext(collection, add_if_missing=True)
@@ -96,64 +94,14 @@ def create_monthly_collection() -> Collection:
 
     # item assets extension
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
-    # for each month (item) assets are defined below.
     item_assets_ext.item_assets = {
-        "tmin_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
+        var_name: AssetDefinition({
+            "title": var_name,
+            "description": var_desc,
+            "type": MediaType.TIFF,
             "roles": ["data"],
-            "description":
-            "TIFF containing Minimum temperature information "
-        }),
-        "tmax_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing Maximum temperature information "
-        }),
-        "tavg_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing average temperature information "
-        }),
-        "precip_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing precipitation information "
-        }),
-        "solarrad_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing Solar Radiation information "
-        }),
-        "windspeed_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing wind speed information "
-        }),
-        "watervap_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing water vapor pressure information "
         })
+        for (var_name, var_desc) in MONTHLY_DATA_VARIABLES.items()
     }
 
     return collection
@@ -178,13 +126,6 @@ def create_monthly_item(
     Returns:
         pystac.Item: STAC Item object.
     """
-    # user defined: resolution and month
-    # item function creates an item of the variables in that res
-    # # and month based on the file name
-    # data organized in folders by month (need function to do this),
-    # # search for res and variable in filename
-
-    # example filename = "wc2.1_30s_tmin_01.tif"
 
     item = None
     for (data_var, data_var_desc) in MONTHLY_DATA_VARIABLES.items():
@@ -240,25 +181,25 @@ def create_monthly_item(
             item_projection = ProjectionExtension.ext(item,
                                                       add_if_missing=True)
             item_projection.epsg = WORLDCLIM_EPSG
+            item_projection.wkt2 = WORLDCLIM_CRS_WKT
             item_projection.bbox = bbox
             item_projection.transform = transform
             item_projection.shape = shape
 
         cog_asset = Asset(
-            href=cog_href,
+            title=data_var,
+            description=data_var_desc,
             media_type=MediaType.TIFF,
             roles=["data"],
-            title=data_var_desc,
+            href=cog_href,
         )
-        item.add_asset(
-            data_var,
-            cog_asset,
-        )
+        item.add_asset(data_var, cog_asset)
 
         # Include projection information on Asset
         cog_asset_proj = ProjectionExtension.ext(cog_asset,
                                                  add_if_missing=True)
         cog_asset_proj.epsg = item_projection.epsg
+        cog_asset_proj.wkt2 = item_projection.wkt2
         cog_asset_proj.transform = item_projection.transform
         cog_asset_proj.bbox = item_projection.bbox
         cog_asset_proj.shape = item_projection.shape
@@ -270,10 +211,10 @@ def create_monthly_item(
             f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value:02d}.json")
     )
 
-    # item scientific extension
+    # scientific extension
     sci_ext = ScientificExtension.ext(item, add_if_missing=True)
-    sci_ext.doi = DOI,
-    sci_ext.citation = CITATION,
+    sci_ext.doi = DOI
+    sci_ext.citation = CITATION
 
     return item
 

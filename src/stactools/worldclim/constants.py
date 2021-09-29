@@ -1,14 +1,11 @@
-# input information from the abstract here
-
 from pyproj import CRS
-from pystac import Provider
-from pystac import Link
+from pystac import Link, Provider
 from pystac.provider import ProviderRole
 
 WORLDCLIM_ID = "world-clim"
 WORLDCLIM_VERSION = 2.1
 WORLDCLIM_EPSG = 4326
-WORLDCLIM_CRS = CRS.from_epsg(WORLDCLIM_EPSG)
+WORLDCLIM_CRS_WKT = CRS.from_epsg(WORLDCLIM_EPSG).to_wkt()
 WORLDCLIM_TITLE = "Historical climate data"
 LICENSE = "CC-BY-SA-4.0"
 title_string = "Creative Commons - Attribution-ShareAlike 4.0 International - CC BY-SA 4.0"
@@ -29,9 +26,7 @@ satellite- derived covariates: maximum and minimum land surface temperature as w
 obtained with the MODIS satellite platform"""
 
 DOI = "10.1002/joc.5086"  # https://doi.org/10.1002/joc.5086
-CITATION = """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
-        resolution climate surfaces for global land areas. International
-        Journal of Climatology 37 (12): 4302-4315."""
+CITATION = "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315."  # noqa E501
 
 START_YEAR = 1970
 END_YEAR = 2000
@@ -43,73 +38,6 @@ WORLDCLIM_PROVIDER = Provider(
     name="WorldClim",
     roles=[ProviderRole.PROCESSOR, ProviderRole.HOST],
     url="https://worldclim.org/data/worldclim21.html")
-
-WORLDCLIM_FTP_tmin = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_tmin.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_tmin.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_tmin.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_tmin.zip"
-]
-WORLDCLIM_FTP_tmax = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_tmax.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_tmax.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_tmax.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_tmax.zip"
-]
-WORLDCLIM_FTP_tavg = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_tavg.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_tavg.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_tavg.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_tavg.zip"
-]
-WORLDCLIM_FTP_precip = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_prec.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_prec.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_prec.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_prec.zip"
-]
-WORLDCLIM_FTP_rad = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_srad.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_srad.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_srad.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_srad.zip"
-]
-WORLDCLIM_FTP_wind = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_wind.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_wind.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_wind.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_wind.zip"
-]
-WORLDCLIM_FTP_vap = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_vapr.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_vapr.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_vapr.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_vapr.zip"
-]
-WORLDCLIM_FTP_bioclim = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_bio.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_bio.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_bio.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_bio.zip"
-]
-WORLDCLIM_FTP_elev = [
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_elev.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_5m_elev.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_2.5m_elev.zip",
-    "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_elev.zip"
-]  # list of all links
-
-COORDINATE_SYSTEM = {
-    "wkt": ('''GEOGCRS[\"WGS 84\",DATUM[\"World Geodetic System 1984\",
-    ELLIPSOID[\"WGS 84\",6378137,298.257223563,
-    LENGTHUNIT["metre",1]]],
-    PRIMEM[\"Greenwich\",0,
-    ANGLEUNIT[\"degree\",0.0174532925199433]],
-    CS[\"ellipsoidal\",2],
-    AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],
-    ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],
-    ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]]''')
-}
 
 BIOCLIM_DESCRIPTION = """Bioclimatic variables are derived from the monthly temperature
 and rainfall values in order to generate more biologically meaningful variables. These are
@@ -130,4 +58,4 @@ MONTHLY_DATA_VARIABLES = {
     "vapr": "Water Vapor Pressure (kPa)"
 }
 
-BIOCLIM_VARIABLES = {}
+BIOCLIM_VARIABLES = {"str": "str"}

@@ -2,8 +2,9 @@ import os.path
 from tempfile import TemporaryDirectory
 
 import pystac
-from stactools.worldclim.commands import create_worldclim_command
 from stactools.testing import CliTestCase
+
+from stactools.worldclim.commands import create_worldclim_command
 
 
 class CommandsTest(CliTestCase):
