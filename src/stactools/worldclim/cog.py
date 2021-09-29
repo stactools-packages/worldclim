@@ -1,16 +1,18 @@
 import logging
 import os
 from glob import glob
-from io import BytesIO
 from subprocess import CalledProcessError, check_output
 from tempfile import TemporaryDirectory
+from urllib.request import urlretrieve
 from zipfile import ZipFile
 
-import requests
+import fsspec
+import rasterio
 
 from stactools.worldclim.constants import (
     DATASET_URL_TEMPLATE,
     MONTHLY_DATA_VARIABLES,
+    TILING_PIXEL_SIZE,
 )
 from stactools.worldclim.enum import Resolution
 
@@ -31,9 +33,12 @@ def download_dataset(output_path: str) -> None:
             var_path = os.path.join(res_path, v)
             os.mkdir(var_path)
             url = DATASET_URL_TEMPLATE.format(resolution=res.value, variable=v)
-            response = requests.get(url)
-            zipfile = ZipFile(BytesIO(response.content))
-            zipfile.extractall(path=var_path)
+            # The following shouldn't blow out the memory when loading large files
+            with TemporaryDirectory() as tmp_dir:
+                tmp_file = os.path.join(tmp_dir, "{res}_{v.value}.zip")
+                urlretrieve(url, tmp_file)
+                with ZipFile(tmp_file) as zipfile:
+                    zipfile.extractall(path=var_path)
 
 
 def convert_dataset(input_path: str, output_path: str) -> None:
@@ -42,12 +47,67 @@ def convert_dataset(input_path: str, output_path: str) -> None:
         create_cog(file_name, out_file_name)
 
 
+def create_retiled_cogs(
+    input_file: str,
+    output_directory: str,
+    raise_on_fail: bool = True,
+) -> None:
+    """Split tiff into tiles and create COGs
+
+    Args:
+        input_path (str): Path to the World Climate data.
+        output_directory (str): The directory to which the COG will be written.
+        raise_on_fail (bool, optional): Whether to raise error on failure.
+            Defaults to True.
+
+    Returns:
+        None
+    """
+    try:
+        with TemporaryDirectory() as tmp_dir:
+            cmd = [
+                "gdal_retile.py",
+                "-ps",
+                str(TILING_PIXEL_SIZE[0]),
+                str(TILING_PIXEL_SIZE[1]),
+                "-targetDir",
+                tmp_dir,
+                input_file,
+            ]
+            try:
+                output = check_output(cmd)
+            except CalledProcessError as e:
+                output = e.output
+                raise
+            finally:
+                logger.info(f"output: {str(output)}")
+            file_names = glob(f"{tmp_dir}/*.tif")
+            for f in file_names:
+                input_file = os.path.join(tmp_dir, f)
+                output_file = os.path.join(
+                    output_directory,
+                    os.path.basename(f).replace(".tif", "") + "_cog.tif")
+                with rasterio.open(input_file, "r") as dataset:
+                    contains_data = dataset.read().any()
+                # Exclude empty files
+                if contains_data:
+                    create_cog(input_file, output_file, raise_on_fail, False)
+
+    except Exception:
+        logger.error("Failed to process {}".format(input_file))
+
+        if raise_on_fail:
+            raise
+
+    return
+
+
 def create_cog(
     input_path: str,
     output_path: str,
     raise_on_fail: bool = True,
     dry_run: bool = False,
-) -> str:
+) -> None:
     """Create COG from a tif
 
     Args:
@@ -59,7 +119,7 @@ def create_cog(
             and writing COG. Defaults to False.
 
     Returns:
-        str: The path to the output COG.
+        None
     """
 
     output = None
@@ -68,6 +128,12 @@ def create_cog(
             logger.info(
                 "Would have downloaded TIF, created COG, and written COG")
         else:
+            with fsspec.open(input_path) as file:
+                # Tile file if too large
+                if file.size > TILING_PIXEL_SIZE[0] * TILING_PIXEL_SIZE[1]:
+                    create_retiled_cogs(input_path, output_path, raise_on_fail)
+                    return
+
             cmd = [
                 "gdal_translate",
                 "-of",
@@ -101,5 +167,3 @@ def create_cog(
 
         if raise_on_fail:
             raise
-
-    return output_path
