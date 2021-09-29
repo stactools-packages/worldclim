@@ -32,7 +32,7 @@ import shapely
 from pystac import (Collection, Asset, Extent, SpatialExtent, TemporalExtent,
                     CatalogType, MediaType, Item)
 
-from pystac.extensions.projection import (ProjectionExtension)
+from pystac.extensions.projection import ProjectionExtension
 from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.version import VersionExtension
 from pystac.extensions.item_assets import AssetDefinition
@@ -76,18 +76,13 @@ def create_monthly_collection() -> Collection:
     collection.add_link(LICENSE_LINK)
 
     # projection extension
-    # collection_proj = ProjectionExtension.ext(collection, add_if_missing=True)
-    # collection_proj.epsg = [WORLDCLIM_EPSG],
-    # collection_proj.wkt2 = "World Geodetic System 1984",
-    # collection_proj.bbox = [-180., 90., 180., -90.],
-    # collection_proj.centroid = [0., 0.],
-    # collection_proj.shape = [4320, 8640],
-    # collection_proj.transform = [-180., 360., 0., 90., 0., 180.]
+    collection_proj = ProjectionExtension.summaries(collection,
+                                                    add_if_missing=True)
+    collection_proj.epsg = [WORLDCLIM_EPSG]
 
-    # collection version
+    # version extension
     collection_version = VersionExtension.ext(collection, add_if_missing=True)
-    collection_version.latest = "https://worldclim.org/data/worldclim21.html",
-    collection_version.predecessor = "https://worldclim.org/data/v1.4/worldclim14.html"
+    collection_version.version = str(WORLDCLIM_VERSION)
 
     # item assets extension
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
