@@ -86,64 +86,14 @@ def create_monthly_collection() -> Collection:
 
     # item assets extension
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
-    # for each month (item) assets are defined below.
     item_assets_ext.item_assets = {
-        "tmin_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
+        var_name: AssetDefinition({
+            "title": var_name,
+            "description": var_desc,
+            "type": MediaType.TIFF,
             "roles": ["data"],
-            "description":
-            "TIFF containing Minimum temperature information "
-        }),
-        "tmax_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing Maximum temperature information "
-        }),
-        "tavg_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing average temperature information "
-        }),
-        "precip_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing precipitation information "
-        }),
-        "solarrad_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing Solar Radiation information "
-        }),
-        "windspeed_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing wind speed information "
-        }),
-        "watervap_tiff":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing water vapor pressure information "
         })
+        for (var_name, var_desc) in MONTHLY_DATA_VARIABLES.items()
     }
 
     return collection
@@ -236,10 +186,11 @@ def create_monthly_item(
             item_projection.shape = shape
 
         cog_asset = Asset(
-            href=cog_href,
+            title=data_var,
+            description=data_var_desc,
             media_type=MediaType.TIFF,
             roles=["data"],
-            title=data_var_desc,
+            href=cog_href,
         )
         item.add_asset(
             data_var,
