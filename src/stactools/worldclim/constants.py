@@ -1,8 +1,7 @@
 # input information from the abstract here
 
 from pyproj import CRS
-from pystac import Provider
-from pystac import Link
+from pystac import Link, Provider
 from pystac.provider import ProviderRole
 
 WORLDCLIM_ID = "world-clim"
