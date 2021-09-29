@@ -128,4 +128,4 @@ MONTHLY_DATA_VARIABLES = {
     "vapr": "Water Vapor Pressure (kPa)"
 }
 
-BIOCLIM_VARIABLES = {}
+BIOCLIM_VARIABLES = {"str": "str"}
