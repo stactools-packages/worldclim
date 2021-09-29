@@ -121,13 +121,6 @@ def create_monthly_item(
     Returns:
         pystac.Item: STAC Item object.
     """
-    # user defined: resolution and month
-    # item function creates an item of the variables in that res
-    # # and month based on the file name
-    # data organized in folders by month (need function to do this),
-    # # search for res and variable in filename
-
-    # example filename = "wc2.1_30s_tmin_01.tif"
 
     item = None
     for (data_var, data_var_desc) in MONTHLY_DATA_VARIABLES.items():
@@ -195,10 +188,7 @@ def create_monthly_item(
             roles=["data"],
             href=cog_href,
         )
-        item.add_asset(
-            data_var,
-            cog_asset,
-        )
+        item.add_asset(data_var, cog_asset)
 
         # Include projection information on Asset
         cog_asset_proj = ProjectionExtension.ext(cog_asset,
