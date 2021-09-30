@@ -1,6 +1,7 @@
 import calendar
 import logging
 import os
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -108,17 +109,13 @@ def create_monthly_collection() -> Collection:
 
 
 def create_monthly_item(
-    resolution: Resolution,
-    month: Month,
     destination: str,
-    cog_dir_href: str,
+    cog_href: str,
     cog_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> Item:
     """Creates a STAC item for a WorldClim dataset.
 
     Args:
-        resolution (Resolution): Desired item resolution
-        month (Month): Desired item month
         destination (str): Destination directory
         cog_dir_href (str): Directory containing COGs
         cog_href_modifier (ReadHrefModifier, optional): Funtion to apply to the cog_dir_href
@@ -127,10 +124,16 @@ def create_monthly_item(
         pystac.Item: STAC Item object.
     """
 
+    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d).*\.tif",
+                     os.path.basename(cog_href))
+    if match is None:
+        raise ValueError("Could not extract necessary values from {cog_href}")
+    res, _, m = match.groups()
+    resolution = Resolution(res)
+    month = Month(int(m))
+
     item = None
     for (data_var, data_var_desc) in MONTHLY_DATA_VARIABLES.items():
-        tiff_file_name = f"wc{WORLDCLIM_VERSION}_{resolution.value}_{data_var}_{month.value:02d}.tif"  # noqa E501
-        cog_href = os.path.join(cog_dir_href, tiff_file_name)
         if cog_href_modifier:
             cog_access_href = cog_href_modifier(cog_href)
         else:
@@ -142,12 +145,20 @@ def create_monthly_item(
             1,
             tzinfo=timezone.utc,
         )
-        end_datetime = datetime(
-            END_YEAR,
-            month.value + 1,
-            1,
-            tzinfo=timezone.utc,
-        ) - timedelta(seconds=1)
+        if month is Month.DECEMBER:
+            end_datetime = datetime(
+                END_YEAR + 1,
+                1,
+                1,
+                tzinfo=timezone.utc,
+            ) - timedelta(seconds=1)
+        else:
+            end_datetime = datetime(
+                END_YEAR,
+                month.value + 1,
+                1,
+                tzinfo=timezone.utc,
+            ) - timedelta(seconds=1)
 
         # use rasterio to open tiff file
         with rasterio.open(cog_access_href) as dataset:
@@ -205,16 +216,15 @@ def create_monthly_item(
         cog_asset_proj.shape = item_projection.shape
 
     assert (item is not None)
-    item.set_self_href(
-        os.path.join(
-            destination,
-            f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value:02d}.json")
-    )
 
     # scientific extension
     sci_ext = ScientificExtension.ext(item, add_if_missing=True)
     sci_ext.doi = DOI
     sci_ext.citation = CITATION
+
+    item.set_self_href(
+        os.path.join(destination,
+                     os.path.basename(cog_href).replace(".tif", ".json")))
 
     return item
 

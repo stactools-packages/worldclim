@@ -1,10 +1,10 @@
 import logging
 import os
+from glob import glob
 
 import click
 
 from stactools.worldclim import cog, stac
-from stactools.worldclim.enum import Month, Resolution
 
 logger = logging.getLogger(__name__)
 
@@ -71,36 +71,50 @@ def create_worldclim_command(cli):
         help="The output directory for the STAC json",
     )
     @click.option(
-        "-r",
-        "--resolution",
-        required=True,
-        help="Resolution of the data",
-    )
-    @click.option(
-        "-m",
-        "--month",
-        required=True,
-        help="Month of the data",
-    )
-    @click.option(
         "-c",
-        "--cogs",
+        "--cog",
         required=True,
         help="Location of a directory contining the cogs",
     )
-    def create_item_command(destination: str, resolution: str, month: str,
-                            cogs: str):
+    def create_item_command(destination: str, cog: str):
         """Creates a STAC Item
         Args:
-            source (str): HREF of the Asset associated with the Item
             destination (str): An HREF for the STAC Collection
+            cog (str): HREF to the Asset COG
         """
-        item = stac.create_monthly_item(Resolution(resolution),
-                                        Month(int(month)), destination, cogs)
+        item = stac.create_monthly_item(destination, cog)
         item.save_object()
         item.validate()
 
         return None
+
+    @worldclim.command(
+        "create-full-collection",
+        short_help="Get all data files and create Items and Collection")
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="The output directory for the STAC json",
+    )
+    def create_full_collection(destination: str):
+        """Creates a STAC Collection and all of its Items and Assets
+        Args:
+            destination (str): An HREF for the STAC Collection
+        """
+
+        cog.download_convert_dataset(destination)
+        for file_name in glob(f"{destination}/*.tif"):
+            print(file_name)
+            item = stac.create_monthly_item(destination, file_name)
+            print(item.self_href)
+            item.save_object()
+            item.validate()
+        collection = stac.create_monthly_collection()
+        collection.set_self_href(os.path.join(destination, "collection.json"))
+        collection.normalize_hrefs(destination)
+        collection.save_object()
+        collection.validate()
 
     return worldclim
 
