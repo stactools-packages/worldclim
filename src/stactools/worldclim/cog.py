@@ -6,7 +6,6 @@ from tempfile import TemporaryDirectory
 from urllib.request import urlretrieve
 from zipfile import ZipFile
 
-import fsspec
 import rasterio
 
 from stactools.worldclim.constants import (
@@ -43,11 +42,15 @@ def download_dataset(output_path: str) -> None:
 
 def convert_dataset(input_path: str, output_path: str) -> None:
     for file_name in glob(f"{input_path}/**/*.tif", recursive=True):
-        out_file_name = os.path.join(output_path, os.path.basename(file_name))
-        create_cog(file_name, out_file_name)
+        if Resolution.THIRTY_SECONDS.value in file_name:
+            create_tiled_cogs(file_name, output_path)
+        else:
+            out_file_name = os.path.join(output_path,
+                                         os.path.basename(file_name))
+            create_cog(file_name, out_file_name)
 
 
-def create_retiled_cogs(
+def create_tiled_cogs(
     input_file: str,
     output_directory: str,
     raise_on_fail: bool = True,
@@ -128,11 +131,6 @@ def create_cog(
             logger.info(
                 "Would have downloaded TIF, created COG, and written COG")
         else:
-            with fsspec.open(input_path) as file:
-                # Tile file if too large
-                if file.size > TILING_PIXEL_SIZE[0] * TILING_PIXEL_SIZE[1]:
-                    create_retiled_cogs(input_path, output_path, raise_on_fail)
-                    return
 
             cmd = [
                 "gdal_translate",
