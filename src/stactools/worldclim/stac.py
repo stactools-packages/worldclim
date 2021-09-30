@@ -89,7 +89,7 @@ def create_monthly_collection() -> Collection:
 
     # item scientific extension
     sci_ext = ScientificExtension.ext(collection, add_if_missing=True)
-    sci_ext.doi = DOI,
+    sci_ext.doi = DOI
     sci_ext.citation = CITATION
 
     # item assets extension
