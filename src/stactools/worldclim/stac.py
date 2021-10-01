@@ -349,7 +349,7 @@ def create_bioclim_item( destination: str,
 
         if item is None:
             # Create item
-            id = f"wc{WORLDCLIM_VERSION}_{resolution.value}"
+            id = f"wc{WORLDCLIM_VERSION}_{resolution.value}_"
             properties = {
                 "title":
                 f"Worldclim {resolution.value} ",
