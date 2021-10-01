@@ -237,227 +237,61 @@ def create_bioclim_collection() -> Collection:
 
     title_bioclim = 'Worldclim Bioclimatic Variables'
 
-    utc = pytz.utc
-    start_year = "1970"
-    end_year = "2000"
-
-    start_datestring = start_year
-    start_datetime = utc.localize(datetime.strptime(start_datestring, "%Y%"))
-    print(start_datetime)
-
-    end_datestring = end_year
-    end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y%"))
-    print(end_datetime)
+    start_datetime = datetime(
+        START_YEAR,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+    end_datetime = datetime(
+        END_YEAR + 1,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    ) - timedelta(seconds=1)  # type: Optional[datetime]
 
     bbox = [-180., 90., 180., -90.]
 
-    collection = pystac.Collection(
-        id=WORLDCLIM_ID,
-        title=title_bioclim,
-        description=BIOCLIM_DESCRIPTION,
-        providers=[WORLDCLIM_PROVIDER[WORLDCLIM_FTP_bioclim]],
-        license=LICENSE,
-        extent=pystac.Extent(
-            pystac.SpatialExtent([bbox]),
-            pystac.TemporalExtent([[start_datetime, end_datetime]])),
-        catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED)
+    collection = Collection(id=WORLDCLIM_ID,
+                            title=WORLDCLIM_TITLE,
+                            description=BIOCLIM_DESCRIPTION,
+                            providers=[WORLDCLIM_PROVIDER],
+                            license=LICENSE,
+                            extent=Extent(
+                                SpatialExtent([bbox]),
+                                TemporalExtent([[start_datetime,
+                                                 end_datetime]])),
+                            catalog_type=CatalogType.RELATIVE_PUBLISHED)
 
     collection.add_link(LICENSE_LINK)
 
-    item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
+    # projection extension
+    collection_proj = ProjectionExtension.summaries(collection,
+                                                    add_if_missing=True)
+    collection_proj.epsg = [WORLDCLIM_EPSG]
 
+    # version extension
+    collection_version = VersionExtension.ext(collection, add_if_missing=True)
+    collection_version.version = str(WORLDCLIM_VERSION)
+
+    # item scientific extension
+    sci_ext = ScientificExtension.ext(collection, add_if_missing=True)
+    sci_ext.doi = DOI
+    sci_ext.citation = CITATION
+
+    # item assets extension
+    item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
     item_assets_ext.item_assets = {
-        "bio_1":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
+        var_name: AssetDefinition({
+            "title": var_name,
+            "description": var_desc,
+            "type": MediaType.TIFF,
             "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO1 = Annual Mean Temperature information "
-        }),
-        "bio_2":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            """TIFF containing 30s resolution BIO2 = Mean Diurnal Range
-            (Mean of monthly (max temp - min temp)) information """
-        }),
-        "bio_3":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO3 = Isothermality (BIO2/BIO7) (×100) information "
-        }),
-        "bio_4":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            """TIFF containing 30s resolution BIO4 = Temperature Seasonality
-            (standard deviation ×100) information """
-        }),
-        "bio_5":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO5 = Max Temperature of Warmest Month information "
-        }),
-        "bio_6":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO6 = Min Temperature of Coldest Month information "
-        }),
-        "bio_7":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            """TIFF containing 30s resolution BIO7 = Temperature Annual Range
-            (BIO5-BIO6) information """
-        }),
-        "bio_8":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO8 = Mean Temperature of Wettest Quarter information "
-        }),
-        "bio_9":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO9 = Mean Temperature of Driest Quarter information "
-        }),
-        "bio_10":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            """TIFF containing 30s resolution BIO10 = Mean Temperature
-            of Warmest Quarter information """
-        }),
-        "bio_11":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            """TIFF containing 30s resolution BIO11 = Mean
-            Temperature of Coldest Quarter information """
-        }),
-        "bio_12":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO12 = Annual Precipitation information "
-        }),
-        "bio_13":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO13 = Precipitation of Wettest Month information "
-        }),
-        "bio_14":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO14 = Precipitation of Driest Month information "
-        }),
-        "bio_15":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            """TIFF containing 30s resolution BIO15 = Precipitation Seasonality
-            (Coefficient of Variation) information """
-        }),
-        "bio_16":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO16 = Precipitation of Wettest Quarter information "
-        }),
-        "bio_17":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO17 = Precipitation of Driest Quarter information "
-        }),
-        "bio_18":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO18 = Precipitation of Warmest Quarter information "
-        }),
-        "bio_19":
-        AssetDefinition({
-            "type":
-            MediaType.TIFF,
-            "roles": ["data"],
-            "description":
-            "TIFF containing 30s resolution BIO19 = Precipitation of Coldest Quarter information "
         })
-    },
-    ScientificExtension({
-        "sci:doi":
-        "https://doi.org/10.1002/joc.5086",
-        "sci:citation":
-        """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces
-        for global land areas. International Journal of Climatology 37 (12): 4302-4315.""",
-        "sci:publications":
-        None,
-        "doi":
-        "https://doi.org/10.1002/joc.5086",
-        "citation":
-        """Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces
-        for global land areas. International Journal of Climatology 37 (12): 4302-4315."""
-    }),
-    PropertiesExtension({  # version
-        "properties": None,
-        "version": "2.1",
-        "title": "WorldClim version 2.1",
-        "description": DESCRIPTION,
-        # "datetime": dataset_datetime
-    }),
-    ProjectionExtension({
-        "proj:epsg": WORLDCLIM_EPSG,
-        "proj:wkt2": "World Geodetic System 1984",
-        "proj:bbox": [-180, 90, 180, -90],
-        "proj:centroid": [0, 0],
-        'proj:shape': [4320, 8640],
-        "proj:transform": [-180, 360, 0, 90, 0, 180]
-    })
+        for (var_name, var_desc) in BIOCLIM_VARIABLES.items()
+    }
 
     return collection
-
 
 # create items for bioclim variables
 def create_bioclim_item( destination: str,
