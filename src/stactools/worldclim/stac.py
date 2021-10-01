@@ -28,6 +28,7 @@ from stactools.core.io import ReadHrefModifier
 
 from stactools.worldclim.constants import (
     BIOCLIM_DESCRIPTION,
+    BIOCLIM_VARIABLES,
     CITATION,
     DESCRIPTION,
     DOI,
@@ -459,12 +460,16 @@ def create_bioclim_collection() -> Collection:
 
 
 # create items for bioclim variables
-def create_bioclim_item(resolution_href: str, directory_loc: os.path) -> Item:
+def create_bioclim_item( destination: str,
+    cog_href: str,
+    cog_href_modifier: Optional[ReadHrefModifier] = None,
+    ) -> Item:
     """Creates a STAC item for a WorldClim Bioclimatic dataset.
 
     Args:
-        resolution_href (str): Desired item resolution
-        directory_loc (os.path) : Local path to dataset
+        destination (str): Destination directory
+        cog_dir_href (str): Directory containing COGs
+        cog_href_modifier (ReadHrefModifier, optional): Funtion to apply to the cog_dir_href
 
     Returns:
         pystac.Item: STAC Item object.
@@ -475,101 +480,96 @@ def create_bioclim_item(resolution_href: str, directory_loc: os.path) -> Item:
     title = 'Worldclim Bioclimatic Variables'
     description = BIOCLIM_DESCRIPTION
 
-    bioclim_variables_dict = {
-        "bio_1": "Annual Mean Temperature",
-        "bio_2": "Mean Diurnal Range (Mean of monthly (max temp - min temp))",
-        "bio_3": "Isothermality (BIO2/BIO7) (×100)",
-        "bio_4": "Temperature Seasonality (standard deviation ×100)",
-        "bio_5": "Max Temperature of Warmest Month",
-        "bio_6": "Min Temperature of Coldest Month",
-        "bio_7": "Temperature Annual Range (BIO5-BIO6)",
-        "bio_8": "Mean Temperature of Wettest Quarter",
-        "bio_9": "Mean Temperature of Driest Quarter",
-        "bio_10": "Mean Temperature of Warmest Quarter",
-        "bio_11": "Mean Temperature of Coldest Quarter",
-        "bio_12": "Annual Precipitation",
-        "bio_13": "Precipitation of Wettest Month",
-        "bio_14": "Precipitation of Driest Month",
-        "bio_15": "Precipitation Seasonality (Coefficient of Variation)",
-        "bio_16": "Precipitation of Wettest Quarter",
-        "bio_17": "Precipitation of Driest Quarter",
-        "bio_18": "Precipitation of Warmest Quarter",
-        "bio_19": "Precipitation of Coldest Quarter",
-    }
+    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d).*\.tif",
+                     os.path.basename(cog_href))
+    if match is None:
+        raise ValueError("Could not extract necessary values from {cog_href}")
+    res, _, m = match.groups()
+    resolution = Resolution(res)
 
-    for key in bioclim_variables_dict.keys():
+    item = None
+    for (data_var, data_var_desc) in BIOCLIM_VARIABLES.items():
+        if cog_href_modifier:
+            cog_access_href = cog_href_modifier(cog_href)
+        else:
+            cog_access_href = cog_href
 
-        tiff_href = "wc2.1_" + resolution_href + "_" + key + ".tif"
-        # example filename = "wc2.1_5m_bio_1.tif"
-
-        utc = pytz.utc
-        # extracts the string after the last underscore and before the last period
-        start_year = "1970"
-        end_year = "2000"
-
-        start_datestring = f"{start_year}"
-        start_datetime = utc.localize(datetime.strptime(
-            start_datestring, "%Y"))
-        print(start_datetime)
-
-        end_datestring = f"{end_year}"
-        end_datetime = utc.localize(datetime.strptime(end_datestring, "%Y"))
-        print(end_datetime)
-
-        # use rasterio
-        if tiff_href is not None:
-            with rasterio.open(tiff_href) as dataset_worldclim:
-                id = title.replace(" ", "-")
-                # geometry = longitude/latitude - get geom based on EPSG
-                geometry = dataset_worldclim.crs
-                bbox = dataset_worldclim.bounds
-                # get bounding box with rastero.bounds
-                properties = {
-                    "title": title,
-                    "description": description
-                }  # does this have to match website?
-
-        # Create item
-        item = pystac.Item(
-            id=id,
-            geometry=geometry,
-            bbox=bbox,
-            datetime=start_datetime,
-            properties=properties,
-            stac_extensions=[],
+        start_datetime = datetime(
+            START_YEAR,
+            1,
+            tzinfo=timezone.utc,
         )
+        end_datetime = datetime(
+            END_YEAR,
+            1,
+            tzinfo=timezone.utc,
+        ) - timedelta(seconds=1)
 
-        if start_datetime and end_datetime:
-            item.common_metadata.start_datetime = start_datetime
-            item.common_metadata.end_datetime = end_datetime
+        # use rasterio to open tiff file
+        with rasterio.open(cog_access_href) as dataset:
+            bbox = list(dataset.bounds)
+            geometry = shapely.geometry.mapping(
+                shapely.geometry.box(*bbox, ccw=True))
+            transform = list(dataset.transform)
+            shape = [dataset.height, dataset.width]
 
-        item.ext.enable("projection")
-        item.ext.projection.epsg = WORLDCLIM_EPSG
+        if item is None:
+            # Create item
+            id = f"wc{WORLDCLIM_VERSION}_{resolution.value}"
+            properties = {
+                "title":
+                f"Worldclim {resolution.value} ",
+                "description": BIOCLIM_DESCRIPTION,
+            }
+            item = Item(
+                id=id,
+                geometry=geometry,
+                bbox=bbox,
+                datetime=start_datetime,
+                properties=properties,
+                stac_extensions=[],
+            )
 
-        item_projection = ProjectionExtension.ext(item, add_if_missing=True)
-        item_projection.epsg = WORLDCLIM_EPSG
+            if start_datetime and end_datetime:
+                item.common_metadata.start_datetime = start_datetime
+                item.common_metadata.end_datetime = end_datetime
 
-        # tiff_href = "wc2.1_"+resolution_href+"_"+key+".tif" # file structure defined above
-        tiff_file_path = open(directory_loc + "/" + tiff_href)
+            item_projection = ProjectionExtension.ext(item,
+                                                      add_if_missing=True)
+            item_projection.epsg = WORLDCLIM_EPSG
+            item_projection.wkt2 = WORLDCLIM_CRS_WKT
+            item_projection.bbox = bbox
+            item_projection.transform = transform
+            item_projection.shape = shape
 
-        # Create asset based on keys in variables_dict
-        item.add_asset(
-            key,
-            Asset(
-                href=tiff_file_path,
-                media_type=MediaType.TIFF,
-                roles=["data"],
-                title=bioclim_variables_dict[key],
-            ))
-        tiff_file_path.close()
+        cog_asset = Asset(
+            title=data_var,
+            description=data_var_desc,
+            media_type=MediaType.TIFF,
+            roles=["data"],
+            href=cog_href,
+        )
+        item.add_asset(data_var, cog_asset)
 
-    # Include projection information
-    proj_ext = ProjectionExtension.ext(item, add_if_missing=True)
-    proj_ext.epsg = item_projection.epsg
-    proj_ext.transform = item_projection.transform
-    proj_ext.bbox = item_projection.bbox
-    proj_ext.wkt2 = item_projection.wkt2
-    proj_ext.shape = item_projection.shape
-    proj_ext.centroid = item_projection.centroid
+        # Include projection information on Asset
+        cog_asset_proj = ProjectionExtension.ext(cog_asset,
+                                                 add_if_missing=True)
+        cog_asset_proj.epsg = item_projection.epsg
+        cog_asset_proj.wkt2 = item_projection.wkt2
+        cog_asset_proj.transform = item_projection.transform
+        cog_asset_proj.bbox = item_projection.bbox
+        cog_asset_proj.shape = item_projection.shape
+
+    assert (item is not None)
+
+    # scientific extension
+    sci_ext = ScientificExtension.ext(item, add_if_missing=True)
+    sci_ext.doi = DOI
+    sci_ext.citation = CITATION
+
+    item.set_self_href(
+        os.path.join(destination,
+                     os.path.basename(cog_href).replace(".tif", ".json")))
 
     return item
+
