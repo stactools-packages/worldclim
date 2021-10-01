@@ -89,6 +89,34 @@ def create_worldclim_command(cli):
         return None
 
     @worldclim.command(
+        "create-bioclim-item",
+        short_help="Create a Bioclimatic STAC item",
+    )
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="The output directory for the STAC json",
+    )
+    @click.option(
+        "-c",
+        "--cog",
+        required=True,
+        help="Location of a directory contining the cogs",
+    )
+    def create_item_command(destination: str, cog: str):
+        """Creates a STAC Item
+        Args:
+            destination (str): An HREF for the STAC Collection
+            cog (str): HREF to the Asset COG
+        """
+        item = stac.create_bioclim_item(destination, cog)
+        item.save_object()
+        item.validate()
+
+        return None
+
+    @worldclim.command(
         "create-full-collection",
         short_help="Get all data files and create Items and Collection")
     @click.option(
