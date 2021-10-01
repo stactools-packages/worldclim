@@ -58,6 +58,26 @@ MONTHLY_DATA_VARIABLES = {
     "vapr": "Water Vapor Pressure (kPa)"
 }
 
-BIOCLIM_VARIABLES = {"str": "str"}
+BIOCLIM_VARIABLES = {
+        "bio_1": "Annual Mean Temperature",
+        "bio_2": "Mean Diurnal Range (Mean of monthly (max temp - min temp))",
+        "bio_3": "Isothermality (BIO2/BIO7) (×100)",
+        "bio_4": "Temperature Seasonality (standard deviation ×100)",
+        "bio_5": "Max Temperature of Warmest Month",
+        "bio_6": "Min Temperature of Coldest Month",
+        "bio_7": "Temperature Annual Range (BIO5-BIO6)",
+        "bio_8": "Mean Temperature of Wettest Quarter",
+        "bio_9": "Mean Temperature of Driest Quarter",
+        "bio_10": "Mean Temperature of Warmest Quarter",
+        "bio_11": "Mean Temperature of Coldest Quarter",
+        "bio_12": "Annual Precipitation",
+        "bio_13": "Precipitation of Wettest Month",
+        "bio_14": "Precipitation of Driest Month",
+        "bio_15": "Precipitation Seasonality (Coefficient of Variation)",
+        "bio_16": "Precipitation of Wettest Quarter",
+        "bio_17": "Precipitation of Driest Quarter",
+        "bio_18": "Precipitation of Warmest Quarter",
+        "bio_19": "Precipitation of Coldest Quarter",
+    }
 
 TILING_PIXEL_SIZE = (10800, 10800)
