@@ -314,8 +314,11 @@ def create_bioclim_item( destination: str,
     title = 'Worldclim Bioclimatic Variables'
     description = BIOCLIM_DESCRIPTION
 
-    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d).*\.tif",
+    # example filename: wc2.1_30s_bio_9.tif
+
+    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(bio_\d+).*\.tif", # rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d).*\.tif",
                      os.path.basename(cog_href))
+
     if match is None:
         raise ValueError("Could not extract necessary values from {cog_href}")
     res, _, m = match.groups()
