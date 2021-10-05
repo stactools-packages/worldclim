@@ -5,8 +5,6 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import pystac
-import pytz
 import rasterio
 import shapely
 from pystac import (
@@ -19,7 +17,6 @@ from pystac import (
     SpatialExtent,
     TemporalExtent,
 )
-from pystac.extensions.base import PropertiesExtension
 from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
 from pystac.extensions.projection import ProjectionExtension
 from pystac.extensions.scientific import ScientificExtension
@@ -37,6 +34,8 @@ from stactools.worldclim.constants import (
     LICENSE_LINK,
     MONTHLY_DATA_VARIABLES,
     START_YEAR,
+    WORLDCLIM_BIOCLIM_ID,
+    WORLDCLIM_BIOCLIM_TITLE,
     WORLDCLIM_CRS_WKT,
     WORLDCLIM_EPSG,
     WORLDCLIM_ID,
@@ -125,11 +124,11 @@ def create_monthly_item(
         pystac.Item: STAC Item object.
     """
 
-    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d).*\.tif",
+    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d)(.*)\.tif",
                      os.path.basename(cog_href))
     if match is None:
         raise ValueError("Could not extract necessary values from {cog_href}")
-    res, _, m = match.groups()
+    res, _, m, tile_str = match.groups()
     resolution = Resolution(res)
     month = Month(int(m))
 
@@ -172,6 +171,10 @@ def create_monthly_item(
         if item is None:
             # Create item
             id = f"wc{WORLDCLIM_VERSION}_{resolution.value}_{month.value}"
+            if tile_str:
+                # If tile numbers are found, append them to the id
+                # Should be of format "_i_j"
+                id += tile_str
             properties = {
                 "title":
                 f"Worldclim {resolution.value} {calendar.month_name[month.value]}",
@@ -234,9 +237,6 @@ def create_monthly_item(
 # month data not stored in bioclim variables
 def create_bioclim_collection() -> Collection:
     # Creates a STAC collection for a WorldClim bioclim variables dataset
-
-    title_bioclim = 'Worldclim Bioclimatic Variables'
-
     start_datetime = datetime(
         START_YEAR,
         1,
@@ -252,8 +252,8 @@ def create_bioclim_collection() -> Collection:
 
     bbox = [-180., 90., 180., -90.]
 
-    collection = Collection(id=WORLDCLIM_ID,
-                            title=WORLDCLIM_TITLE,
+    collection = Collection(id=WORLDCLIM_BIOCLIM_ID,
+                            title=WORLDCLIM_BIOCLIM_TITLE,
                             description=BIOCLIM_DESCRIPTION,
                             providers=[WORLDCLIM_PROVIDER],
                             license=LICENSE,
@@ -282,22 +282,21 @@ def create_bioclim_collection() -> Collection:
     # item assets extension
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
     item_assets_ext.item_assets = {
-        var_name: AssetDefinition({
-            "title": var_name,
-            "description": var_desc,
+        "data": AssetDefinition({
             "type": MediaType.TIFF,
             "roles": ["data"],
         })
-        for (var_name, var_desc) in BIOCLIM_VARIABLES.items()
     }
 
     return collection
 
+
 # create items for bioclim variables
-def create_bioclim_item( destination: str,
+def create_bioclim_item(
+    destination: str,
     cog_href: str,
     cog_href_modifier: Optional[ReadHrefModifier] = None,
-    ) -> Item:
+) -> Item:
     """Creates a STAC item for a WorldClim Bioclimatic dataset.
 
     Args:
@@ -308,94 +307,88 @@ def create_bioclim_item( destination: str,
     Returns:
         pystac.Item: STAC Item object.
     """
-    # item = resolution
-    # assets = bioclim variables
 
-    title = 'Worldclim Bioclimatic Variables'
-    description = BIOCLIM_DESCRIPTION
-
-    # example filename: wc2.1_30s_bio_9.tif
-
-    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(bio_\d+).*\.tif", # rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d).*\.tif",
+    match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(bio_\d+)(.*)\.tif",
                      os.path.basename(cog_href))
-
     if match is None:
         raise ValueError("Could not extract necessary values from {cog_href}")
-    res, _, m = match.groups()
+    res, bio_var, tile_str = match.groups()
     resolution = Resolution(res)
+    bio_var_desc = BIOCLIM_VARIABLES[bio_var]
 
-    item = None
-    for (data_var, data_var_desc) in BIOCLIM_VARIABLES.items():
-        if cog_href_modifier:
-            cog_access_href = cog_href_modifier(cog_href)
-        else:
-            cog_access_href = cog_href
+    if cog_href_modifier:
+        cog_access_href = cog_href_modifier(cog_href)
+    else:
+        cog_access_href = cog_href
 
-        start_datetime = datetime(
-            START_YEAR,
-            1,
-            tzinfo=timezone.utc,
-        )
-        end_datetime = datetime(
-            END_YEAR,
-            1,
-            tzinfo=timezone.utc,
-        ) - timedelta(seconds=1)
+    start_datetime = datetime(
+        START_YEAR,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+    end_datetime = datetime(
+        END_YEAR + 1,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    ) - timedelta(seconds=1)
 
-        # use rasterio to open tiff file
-        with rasterio.open(cog_access_href) as dataset:
-            bbox = list(dataset.bounds)
-            geometry = shapely.geometry.mapping(
-                shapely.geometry.box(*bbox, ccw=True))
-            transform = list(dataset.transform)
-            shape = [dataset.height, dataset.width]
+    # use rasterio to open tiff file
+    with rasterio.open(cog_access_href) as dataset:
+        bbox = list(dataset.bounds)
+        geometry = shapely.geometry.mapping(
+            shapely.geometry.box(*bbox, ccw=True))
+        transform = list(dataset.transform)
+        shape = [dataset.height, dataset.width]
 
-        if item is None:
-            # Create item
-            id = f"wc{WORLDCLIM_VERSION}_{resolution.value}_"
-            properties = {
-                "title":
-                f"Worldclim {resolution.value} ",
-                "description": BIOCLIM_DESCRIPTION,
-            }
-            item = Item(
-                id=id,
-                geometry=geometry,
-                bbox=bbox,
-                datetime=start_datetime,
-                properties=properties,
-                stac_extensions=[],
-            )
+    # Create item
+    id = f"wc{WORLDCLIM_VERSION}_{resolution.value}"
+    if tile_str:
+        # If tile numbers are found, append them to the id
+        # Should be of format "_i_j"
+        id += tile_str
 
-            if start_datetime and end_datetime:
-                item.common_metadata.start_datetime = start_datetime
-                item.common_metadata.end_datetime = end_datetime
+    properties = {
+        "title": f"Worldclim {bio_var_desc}",
+        "description": BIOCLIM_DESCRIPTION,
+    }
+    item = Item(
+        id=id,
+        geometry=geometry,
+        bbox=bbox,
+        datetime=start_datetime,
+        properties=properties,
+        stac_extensions=[],
+    )
 
-            item_projection = ProjectionExtension.ext(item,
-                                                      add_if_missing=True)
-            item_projection.epsg = WORLDCLIM_EPSG
-            item_projection.wkt2 = WORLDCLIM_CRS_WKT
-            item_projection.bbox = bbox
-            item_projection.transform = transform
-            item_projection.shape = shape
+    if start_datetime and end_datetime:
+        item.common_metadata.start_datetime = start_datetime
+        item.common_metadata.end_datetime = end_datetime
 
-        cog_asset = Asset(
-            title=data_var,
-            description=data_var_desc,
-            media_type=MediaType.TIFF,
-            roles=["data"],
-            href=cog_href,
-        )
-        item.add_asset(data_var, cog_asset)
+    item_projection = ProjectionExtension.ext(item, add_if_missing=True)
+    item_projection.epsg = WORLDCLIM_EPSG
+    item_projection.wkt2 = WORLDCLIM_CRS_WKT
+    item_projection.bbox = bbox
+    item_projection.transform = transform
+    item_projection.shape = shape
 
-        # Include projection information on Asset
-        cog_asset_proj = ProjectionExtension.ext(cog_asset,
-                                                 add_if_missing=True)
-        cog_asset_proj.epsg = item_projection.epsg
-        cog_asset_proj.wkt2 = item_projection.wkt2
-        cog_asset_proj.transform = item_projection.transform
-        cog_asset_proj.bbox = item_projection.bbox
-        cog_asset_proj.shape = item_projection.shape
+    cog_asset = Asset(
+        title=bio_var_desc,
+        description=bio_var_desc,
+        media_type=MediaType.TIFF,
+        roles=["data"],
+        href=cog_href,
+    )
+    item.add_asset(bio_var, cog_asset)
+
+    # Include projection information on Asset
+    cog_asset_proj = ProjectionExtension.ext(cog_asset, add_if_missing=True)
+    cog_asset_proj.epsg = item_projection.epsg
+    cog_asset_proj.wkt2 = item_projection.wkt2
+    cog_asset_proj.transform = item_projection.transform
+    cog_asset_proj.bbox = item_projection.bbox
+    cog_asset_proj.shape = item_projection.shape
 
     assert (item is not None)
 
@@ -409,4 +402,3 @@ def create_bioclim_item( destination: str,
                      os.path.basename(cog_href).replace(".tif", ".json")))
 
     return item
-

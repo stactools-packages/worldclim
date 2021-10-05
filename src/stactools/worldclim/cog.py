@@ -18,13 +18,13 @@ from stactools.worldclim.enum import Resolution
 logger = logging.getLogger(__name__)
 
 
-def download_convert_dataset(output_path: str) -> None:
+def download_convert_monthly_dataset(output_path: str) -> None:
     with TemporaryDirectory() as tmp_dir:
-        download_dataset(tmp_dir)
-        convert_dataset(tmp_dir, output_path)
+        download_monthly_dataset(tmp_dir)
+        convert_monthly_dataset(tmp_dir, output_path)
 
 
-def download_dataset(output_path: str) -> None:
+def download_monthly_dataset(output_path: str) -> None:
     for res in Resolution:
         res_path = os.path.join(output_path, res.value)
         os.mkdir(res_path)
@@ -40,7 +40,36 @@ def download_dataset(output_path: str) -> None:
                     zipfile.extractall(path=var_path)
 
 
-def convert_dataset(input_path: str, output_path: str) -> None:
+def convert_monthly_dataset(input_path: str, output_path: str) -> None:
+    for file_name in glob(f"{input_path}/**/*.tif", recursive=True):
+        if Resolution.THIRTY_SECONDS.value in file_name:
+            create_tiled_cogs(file_name, output_path)
+        else:
+            out_file_name = os.path.join(output_path,
+                                         os.path.basename(file_name))
+            create_cog(file_name, out_file_name)
+
+
+def download_convert_bioclim_dataset(output_path: str) -> None:
+    with TemporaryDirectory() as tmp_dir:
+        download_bioclim_dataset(tmp_dir)
+        convert_bioclim_dataset(tmp_dir, output_path)
+
+
+def download_bioclim_dataset(output_path: str) -> None:
+    for res in Resolution:
+        res_path = os.path.join(output_path, res.value)
+        os.mkdir(res_path)
+        url = DATASET_URL_TEMPLATE.format(resolution=res.value, variable="bio")
+        # The following shouldn't blow out the memory when loading large files
+        with TemporaryDirectory() as tmp_dir:
+            tmp_file = os.path.join(tmp_dir, "{res}_bio.zip")
+            urlretrieve(url, tmp_file)
+            with ZipFile(tmp_file) as zipfile:
+                zipfile.extractall(path=res_path)
+
+
+def convert_bioclim_dataset(input_path: str, output_path: str) -> None:
     for file_name in glob(f"{input_path}/**/*.tif", recursive=True):
         if Resolution.THIRTY_SECONDS.value in file_name:
             create_tiled_cogs(file_name, output_path)
@@ -87,9 +116,8 @@ def create_tiled_cogs(
             file_names = glob(f"{tmp_dir}/*.tif")
             for f in file_names:
                 input_file = os.path.join(tmp_dir, f)
-                output_file = os.path.join(
-                    output_directory,
-                    os.path.basename(f))
+                output_file = os.path.join(output_directory,
+                                           os.path.basename(f))
                 with rasterio.open(input_file, "r") as dataset:
                     contains_data = dataset.read().any()
                 # Exclude empty files

@@ -18,7 +18,7 @@ def create_worldclim_command(cli):
     def worldclim():
         pass
 
-    @worldclim.command("create-all-cogs",
+    @worldclim.command("create-all-monthly-cogs",
                        short_help="Download and convert all data files to COGs"
                        )
     @click.option(
@@ -27,14 +27,32 @@ def create_worldclim_command(cli):
         required=True,
         help="The output directory for the STAC json",
     )
-    def create_all_cogs(destination: str):
+    def create_all_monthly_cogs(destination: str):
         """Creates a STAC Item
         Args:
             source (str): HREF of the Asset associated with the Item
             destination (str): An HREF for the STAC Collection
         """
 
-        cog.download_convert_dataset(destination)
+        cog.download_convert_monthly_dataset(destination)
+
+    @worldclim.command("create-all-bioclim-cogs",
+                       short_help="Download and convert all data files to COGs"
+                       )
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="The output directory for the STAC json",
+    )
+    def create_all_bioclim_cogs(destination: str):
+        """Creates a STAC Item
+        Args:
+            source (str): HREF of the Asset associated with the Item
+            destination (str): An HREF for the STAC Collection
+        """
+
+        cog.download_convert_bioclim_dataset(destination)
 
     @worldclim.command(
         "create-monthly-collection",
@@ -70,7 +88,7 @@ def create_worldclim_command(cli):
         required=True,
         help="The output directory for the STAC json",
     )
-    def create_collection_command(destination: str):
+    def create_monthly_collection_command(destination: str):
         """Creates a STAC Collection
         Args:
             destination (str): An HREF for the Collection JSON
@@ -94,7 +112,7 @@ def create_worldclim_command(cli):
         required=True,
         help="The output directory for the STAC json",
     )
-    def create_collection_command(destination: str):
+    def create_bioclim_collection_command(destination: str):
         """Creates a STAC Collection
         Args:
             destination (str): An HREF for the Collection JSON
@@ -124,7 +142,7 @@ def create_worldclim_command(cli):
         required=True,
         help="Location of a directory contining the cogs",
     )
-    def create_item_command(destination: str, cog: str):
+    def create_monthly_item_command(destination: str, cog: str):
         """Creates a STAC Item
         Args:
             destination (str): An HREF for the STAC Collection
@@ -152,7 +170,7 @@ def create_worldclim_command(cli):
         required=True,
         help="Location of a directory contining the cogs",
     )
-    def create_item_command(destination: str, cog: str):
+    def create_bioclim_item_command(destination: str, cog: str):
         """Creates a STAC Item
         Args:
             destination (str): An HREF for the STAC Collection
@@ -165,7 +183,7 @@ def create_worldclim_command(cli):
         return None
 
     @worldclim.command(
-        "create-full-collection",
+        "create-full-monthly-collection",
         short_help="Get all data files and create Items and Collection")
     @click.option(
         "-d",
@@ -173,13 +191,13 @@ def create_worldclim_command(cli):
         required=True,
         help="The output directory for the STAC json",
     )
-    def create_full_collection(destination: str):
+    def create_full_monthly__collection(destination: str):
         """Creates a STAC Collection and all of its Items and Assets
         Args:
             destination (str): An HREF for the STAC Collection
         """
 
-        cog.download_convert_dataset(destination)
+        cog.download_convert_monthly_dataset(destination)
         for file_name in glob(f"{destination}/*.tif"):
             print(file_name)
             item = stac.create_monthly_item(destination, file_name)
@@ -187,6 +205,34 @@ def create_worldclim_command(cli):
             item.save_object()
             item.validate()
         collection = stac.create_monthly_collection()
+        collection.set_self_href(os.path.join(destination, "collection.json"))
+        collection.normalize_hrefs(destination)
+        collection.save_object()
+        collection.validate()
+
+    @worldclim.command(
+        "create-full-bioclim-collection",
+        short_help="Get all data files and create Items and Collection")
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="The output directory for the STAC json",
+    )
+    def create_full_bioclim__collection(destination: str):
+        """Creates a STAC Collection and all of its Items and Assets
+        Args:
+            destination (str): An HREF for the STAC Collection
+        """
+
+        cog.download_convert_bioclim_dataset(destination)
+        for file_name in glob(f"{destination}/*.tif"):
+            print(file_name)
+            item = stac.create_bioclim_item(destination, file_name)
+            print(item.self_href)
+            item.save_object()
+            item.validate()
+        collection = stac.create_bioclim_collection()
         collection.set_self_href(os.path.join(destination, "collection.json"))
         collection.normalize_hrefs(destination)
         collection.save_object()

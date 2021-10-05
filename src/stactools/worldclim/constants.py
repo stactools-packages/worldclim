@@ -2,11 +2,13 @@ from pyproj import CRS
 from pystac import Link, Provider
 from pystac.provider import ProviderRole
 
-WORLDCLIM_ID = "world-clim"
+WORLDCLIM_ID = "worldclim-hist-monthly"
+WORLDCLIM_BIOCLIM_ID = "worldclim-hist-bioclim"
 WORLDCLIM_VERSION = 2.1
 WORLDCLIM_EPSG = 4326
 WORLDCLIM_CRS_WKT = CRS.from_epsg(WORLDCLIM_EPSG).to_wkt()
-WORLDCLIM_TITLE = "Historical climate data"
+WORLDCLIM_TITLE = "WorldClim historical climate data by month"
+WORLDCLIM_BIOCLIM_TITLE = "WorldClim historical bioclimatic variables"
 LICENSE = "CC-BY-SA-4.0"
 title_string = "Creative Commons - Attribution-ShareAlike 4.0 International - CC BY-SA 4.0"
 LICENSE_LINK = Link(rel="license",
