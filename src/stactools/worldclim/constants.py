@@ -2,8 +2,8 @@ from pyproj import CRS
 from pystac import Link, Provider
 from pystac.provider import ProviderRole
 
-WORLDCLIM_ID = "worldclim-hist-monthly"
-WORLDCLIM_BIOCLIM_ID = "worldclim-hist-bioclim"
+WORLDCLIM_ID = "worldclim-monthly"
+WORLDCLIM_BIOCLIM_ID = "worldclim-bioclim"
 WORLDCLIM_VERSION = 2.1
 WORLDCLIM_EPSG = 4326
 WORLDCLIM_CRS_WKT = CRS.from_epsg(WORLDCLIM_EPSG).to_wkt()
