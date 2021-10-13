@@ -127,7 +127,7 @@ def create_monthly_item(
                      os.path.basename(cog_href))
     if match is None:
         raise ValueError("Could not extract necessary values from {cog_href}")
-    res, _, m, tile_str = match.groups()
+    res, cog_var, m, tile_str = match.groups()
     resolution = Resolution(res)
     month = Month(int(m))
 
@@ -205,7 +205,7 @@ def create_monthly_item(
             description=data_var_desc,
             media_type=MediaType.TIFF,
             roles=["data"],
-            href=cog_href,
+            href=cog_href.replace(cog_var, data_var),
         )
         item.add_asset(data_var, cog_asset)
 
