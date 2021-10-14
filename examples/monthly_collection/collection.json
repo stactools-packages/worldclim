@@ -1,6 +1,6 @@
 {
   "type": "Collection",
-  "id": "worldclim-hist-monthly",
+  "id": "worldclim-monthly",
   "stac_version": "1.0.0",
   "description": "This is WorldClim version 2.1 climate data for 1970-2000. This version was\nreleased in January 2020. There are monthly climate data for minimum, mean, and maximum temperature,\nprecipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There\nare also 19 \u201cbioclimatic\u201d variables. The data is available at the four spatial resolutions, between\n30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a \u201czip\u201d file containing 12 GeoTiff\n(.tif) files, one for each month of the year (January is 1; December is 12).",
   "links": [
@@ -20,7 +20,7 @@
     },
     {
       "rel": "self",
-      "href": "/Users/cpapalaz/Documents/worldclim/newmonthlycollection.json/collection.json",
+      "href": "/Users/cpapalaz/Documents/worldclim/monthly_collection/collection.json",
       "type": "application/json"
     }
   ],
