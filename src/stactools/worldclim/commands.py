@@ -149,6 +149,9 @@ def create_worldclim_command(cli):
             cog (str): HREF to the Asset COG
         """
         item = stac.create_monthly_item(destination, cog)
+        item.set_self_href(
+            os.path.join(destination,
+                         os.path.basename(cog).replace(".tif", ".json")))
         item.save_object()
         item.validate()
 
