@@ -290,6 +290,7 @@ def create_bioclim_collection() -> Collection:
 
 # create items for bioclim variables
 def create_bioclim_item(
+    destination: str,
     cog_href: str,
     cog_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> Item:
