@@ -148,6 +148,8 @@ def create_worldclim_command(cli):
             destination (str): An HREF for the STAC Collection
             cog (str): HREF to the Asset COG
         """
+        # modify cog string to readhref to pass into cog below
+
         item = stac.create_monthly_item(destination, cog)
         item.set_self_href(
             os.path.join(destination,

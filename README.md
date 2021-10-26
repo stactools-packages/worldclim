@@ -1,12 +1,12 @@
 # stactools-package
 
 stactools worldclim
-Name: worldclim
-Package: stactools.worldclim
-PyPI: https://pypi.org/project/stactools-worldclim/
-Owner: @sparkgeo
-Dataset homepage: WorldClim
-STAC extensions used:
+- Name: worldclim
+- Package: stactools.worldclim
+- PyPI: https://pypi.org/project/stactools-worldclim/
+- Owner: @sparkgeo
+- Dataset homepage: WorldClim
+- STAC extensions used:
 
 version
 scientific

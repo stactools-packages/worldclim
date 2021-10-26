@@ -109,6 +109,7 @@ def create_monthly_collection() -> Collection:
 
 
 def create_monthly_item(
+    destination: str,
     cog_href: str,
     cog_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> Item:
@@ -225,7 +226,9 @@ def create_monthly_item(
     sci_ext.doi = DOI
     sci_ext.citation = CITATION
 
-    item.set_self_href(os.path.basename(cog_href).replace(".tif", ".json"))
+    item.set_self_href(
+        os.path.join(destination,
+                     os.path.basename(cog_href).replace(".tif", ".json")))
 
     return item
 
