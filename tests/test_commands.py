@@ -19,7 +19,7 @@ class CommandsTest(CliTestCase):
             destination = os.path.join(tmp_dir, "collection.json")
 
             result = self.run_command(
-                ["worldclim", "create-collection", destination])
+                ["worldclim", "create-monthly-collection", destination])
 
             self.assertEqual(result.exit_code,
                              0,
@@ -42,7 +42,7 @@ class CommandsTest(CliTestCase):
             destination = os.path.join(tmp_dir, "collection.json")
             result = self.run_command([
                 "worldclim",
-                "create-item",
+                "create-monthly-item",
                 "/path/to/asset.tif",
                 destination,
             ])
