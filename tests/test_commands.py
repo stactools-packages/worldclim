@@ -17,7 +17,7 @@ class CommandsTest(CliTestCase):
             # Run your custom create-collection command and validate
 
             # Example:
-            destination = os.path.join(tmp_dir, "collection.json")
+            destination = tmp_dir
 
             result = self.run_command(
                 ["worldclim", "create-monthly-collection", "-d", destination])
@@ -29,7 +29,8 @@ class CommandsTest(CliTestCase):
             jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
             self.assertEqual(len(jsons), 1)
 
-            collection = pystac.Item.from_file(destination)
+            collection_file = os.path.join(tmp_dir, "collection.json")
+            collection = pystac.read_file(collection_file)
             self.assertEqual(collection.id, "worldclim-monthly")
             # self.assertEqual(item.other_attr...
 
@@ -40,7 +41,7 @@ class CommandsTest(CliTestCase):
             # Run your custom create-item command and validate
 
             # Example:
-            destination = os.path.join(tmp_dir, "collection.json")
+            destination = tmp_dir
             result = self.run_command([
                 "worldclim",
                 "create-monthly-item",
@@ -57,9 +58,10 @@ class CommandsTest(CliTestCase):
             jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
             self.assertEqual(len(jsons), 1)
 
-            item = pystac.Item.from_file(destination)
+            item_file = os.path.join(tmp_dir, "wc2.1_10m_prec_01.json")
+            item = pystac.read_file(item_file)
             self.assertEqual(item.id,
-                             "prec")  # not sure if this is the item ID
+                             "wc2.1_10m_1")  # not sure if this is the item ID
             # self.assertEqual(item.other_attr...
 
             item.validate()
