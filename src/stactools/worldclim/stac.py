@@ -134,10 +134,13 @@ def create_monthly_item(
 
     item = None
     for (data_var, data_var_desc) in MONTHLY_DATA_VARIABLES.items():
-        if cog_href_modifier:
-            cog_access_href = cog_href_modifier(cog_href)
-        else:
-            cog_access_href = cog_href
+        cog_access_href = cog_href_modifier(
+            cog_href) if cog_href_modifier else cog_href
+        #     if cog_href_modifier:
+        #         cog_access_href = cog_href_modifier(
+        #             cog_href) if cog_href_modifier else cog_href
+        #     else:
+        #         cog_access_href = cog_href
 
         start_datetime = datetime(
             START_YEAR,

@@ -19,7 +19,7 @@ class CommandsTest(CliTestCase):
             destination = os.path.join(tmp_dir, "collection.json")
 
             result = self.run_command(
-                ["worldclim", "create-monthly-collection", destination])
+                ["worldclim", "create-monthly-collection", "-d", destination])
 
             self.assertEqual(result.exit_code,
                              0,
@@ -29,7 +29,7 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             collection = pystac.read_file(destination)
-            self.assertEqual(collection.id, "my-collection-id")
+            self.assertEqual(collection.id, "worldclim-monthly")
             # self.assertEqual(item.other_attr...
 
             collection.validate()
@@ -43,7 +43,9 @@ class CommandsTest(CliTestCase):
             result = self.run_command([
                 "worldclim",
                 "create-monthly-item",
-                "/path/to/asset.tif",
+                "-c",
+                "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_prec_01.tif",
+                "-d",
                 destination,
             ])
             self.assertEqual(result.exit_code,
@@ -54,7 +56,7 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             item = pystac.read_file(destination)
-            self.assertEqual(item.id, "my-item-id")
+            self.assertEqual(item.id, "prec")
             # self.assertEqual(item.other_attr...
 
             item.validate()
