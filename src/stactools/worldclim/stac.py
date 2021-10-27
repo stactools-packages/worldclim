@@ -3,7 +3,7 @@ import logging
 import os
 import re
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Callable, Optional
 
 import rasterio
 import shapely
@@ -111,7 +111,7 @@ def create_monthly_collection() -> Collection:
 def create_monthly_item(
     destination: str,
     cog_href: str,
-    cog_href_modifier: Optional[ReadHrefModifier] = None,
+    cog_href_modifier: Optional[Callable] = None,
 ) -> Item:
     """Creates a STAC item for a WorldClim dataset.
 
@@ -134,12 +134,11 @@ def create_monthly_item(
 
     item = None
     for (data_var, data_var_desc) in MONTHLY_DATA_VARIABLES.items():
-        cog_access_href = cog_href
-        #     if cog_href_modifier:
-        #         cog_access_href = cog_href_modifier(
-        #             cog_href) if cog_href_modifier else cog_href
-        #     else:
-        #         cog_access_href = cog_href
+        # cog_access_href = cog_href
+        if cog_href_modifier:
+            cog_access_href = cog_href_modifier(cog_href)
+        else:
+            cog_access_href = cog_href
 
         start_datetime = datetime(
             START_YEAR,

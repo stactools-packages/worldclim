@@ -2,6 +2,7 @@ import os.path
 from tempfile import TemporaryDirectory
 
 import pystac
+# from pystac.stac_io import StacIO
 from stactools.testing import CliTestCase
 
 from stactools.worldclim.commands import create_worldclim_command
@@ -28,7 +29,7 @@ class CommandsTest(CliTestCase):
             jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
             self.assertEqual(len(jsons), 1)
 
-            collection = pystac.read_file(destination)
+            collection = pystac.Item.from_file(destination)
             self.assertEqual(collection.id, "worldclim-monthly")
             # self.assertEqual(item.other_attr...
 
@@ -56,8 +57,9 @@ class CommandsTest(CliTestCase):
             jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
             self.assertEqual(len(jsons), 1)
 
-            item = pystac.read_file(destination)
-            self.assertEqual(item.id, "prec") # not sure if this is the item ID
+            item = pystac.Item.from_file(destination)
+            self.assertEqual(item.id,
+                             "prec")  # not sure if this is the item ID
             # self.assertEqual(item.other_attr...
 
             item.validate()
