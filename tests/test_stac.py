@@ -22,13 +22,12 @@ class StacTest(unittest.TestCase):
         # Create the STAC Item...
         item = stac.create_monthly_item(
             "/Users/cpapalaz/Downloads/wc2.1_2.5m_prec/",
-            "/Users/cpapalaz/Downloads/wc2.1_2.5m_prec/wc2.1_2.5m_prec_05.tif",
             "/Users/cpapalaz/Downloads/wc2.1_2.5m_prec/wc2.1_2.5m_prec_05.tif"
         )  # change this
 
         # Check that it has some required attributes
         self.assertEqual(item.id,
-                         "my-item-id")  # create IDs for all other items
+                         "wc2.1_2.5m_5")  # create IDs for all other items
         # self.assertEqual(item.other_attr...
 
         # Validate

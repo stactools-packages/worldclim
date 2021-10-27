@@ -44,10 +44,11 @@ class CommandsTest(CliTestCase):
                 "worldclim",
                 "create-monthly-item",
                 "-c",
-                "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_prec_01.tif",
+                "tests/data-files/wc2.1_10m_prec_01.tif",
                 "-d",
                 destination,
             ])
+            print(destination)
             self.assertEqual(result.exit_code,
                              0,
                              msg="\n{}".format(result.output))
@@ -56,7 +57,7 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             item = pystac.read_file(destination)
-            self.assertEqual(item.id, "prec")
+            self.assertEqual(item.id, "prec") # not sure if this is the item ID
             # self.assertEqual(item.other_attr...
 
             item.validate()
