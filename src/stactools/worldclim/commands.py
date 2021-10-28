@@ -244,6 +244,3 @@ def create_worldclim_command(cli):
         collection.validate()
 
     return worldclim
-
-
-int()
