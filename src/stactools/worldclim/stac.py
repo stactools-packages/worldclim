@@ -109,20 +109,23 @@ def create_monthly_collection() -> Collection:
 
 
 def create_monthly_item(
-    destination: str,
     cog_href: str,
     cog_href_modifier: Optional[Callable] = None,
 ) -> Item:
     """Creates a STAC item for a WorldClim dataset.
 
     Args:
-        destination (str): Destination directory
         cog_dir_href (str): Directory containing COGs
         cog_href_modifier (ReadHrefModifier, optional): Funtion to apply to the cog_dir_href
 
     Returns:
         pystac.Item: STAC Item object.
     """
+
+    if cog_href_modifier is not None:
+        cog_access_href = cog_href_modifier(cog_href)
+    else:
+        cog_access_href = cog_href
 
     match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(.*)_(\d\d)(.*)\.tif",
                      os.path.basename(cog_href))
@@ -134,12 +137,6 @@ def create_monthly_item(
 
     item = None
     for (data_var, data_var_desc) in MONTHLY_DATA_VARIABLES.items():
-        # cog_access_href = cog_href
-        if cog_href_modifier:
-            cog_access_href = cog_href_modifier(cog_href)
-        else:
-            cog_access_href = cog_href
-
         start_datetime = datetime(
             START_YEAR,
             month.value,
@@ -227,10 +224,6 @@ def create_monthly_item(
     sci_ext.doi = DOI
     sci_ext.citation = CITATION
 
-    item.set_self_href(
-        os.path.join(destination,
-                     os.path.basename(cog_href).replace(".tif", ".json")))
-
     return item
 
 
@@ -294,20 +287,23 @@ def create_bioclim_collection() -> Collection:
 
 # create items for bioclim variables
 def create_bioclim_item(
-    destination: str,
     cog_href: str,
     cog_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> Item:
     """Creates a STAC item for a WorldClim Bioclimatic dataset.
 
     Args:
-        destination (str): Destination directory
         cog_dir_href (str): Directory containing COGs
         cog_href_modifier (ReadHrefModifier, optional): Funtion to apply to the cog_dir_href
 
     Returns:
         pystac.Item: STAC Item object.
     """
+
+    if cog_href_modifier is not None:
+        cog_access_href = cog_href_modifier(cog_href)
+    else:
+        cog_access_href = cog_href
 
     match = re.match(rf".*{WORLDCLIM_VERSION}_(.*)_(bio_\d+)(.*)\.tif",
                      os.path.basename(cog_href))
@@ -316,11 +312,6 @@ def create_bioclim_item(
     res, bio_var, tile_str = match.groups()
     resolution = Resolution(res)
     bio_var_desc = BIOCLIM_VARIABLES[bio_var]
-
-    if cog_href_modifier:
-        cog_access_href = cog_href_modifier(cog_href)
-    else:
-        cog_access_href = cog_href
 
     start_datetime = datetime(
         START_YEAR,
@@ -344,7 +335,7 @@ def create_bioclim_item(
         shape = [dataset.height, dataset.width]
 
     # Create item
-    id = f"wc{WORLDCLIM_VERSION}_{resolution.value}"
+    id = f"wc{WORLDCLIM_VERSION}_{resolution.value}_{bio_var}"
     if tile_str:
         # If tile numbers are found, append them to the id
         # Should be of format "_i_j"
@@ -391,15 +382,9 @@ def create_bioclim_item(
     cog_asset_proj.bbox = item_projection.bbox
     cog_asset_proj.shape = item_projection.shape
 
-    assert (item is not None)
-
     # scientific extension
     sci_ext = ScientificExtension.ext(item, add_if_missing=True)
     sci_ext.doi = DOI
     sci_ext.citation = CITATION
-
-    item.set_self_href(
-        os.path.join(destination,
-                     os.path.basename(cog_href).replace(".tif", ".json")))
 
     return item
