@@ -1,10 +1,12 @@
 import logging
 import os
+import shutil
 from glob import glob
 
 import click
 
 from stactools.worldclim import cog, stac
+from stactools.worldclim.constants import MONTHLY_DATA_VARIABLES
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +20,10 @@ def create_worldclim_command(cli):
     def worldclim():
         pass
 
-    @worldclim.command("create-all-monthly-cogs",
-                       short_help="Download and convert all data files to COGs"
-                       )
+    @worldclim.command(
+        "create-all-monthly-cogs",
+        short_help="Download and convert all data files to COGs",
+    )
     @click.option(
         "-d",
         "--destination",
@@ -36,9 +39,10 @@ def create_worldclim_command(cli):
 
         cog.download_convert_monthly_dataset(destination)
 
-    @worldclim.command("create-all-bioclim-cogs",
-                       short_help="Download and convert all data files to COGs"
-                       )
+    @worldclim.command(
+        "create-all-bioclim-cogs",
+        short_help="Download and convert all data files to COGs",
+    )
     @click.option(
         "-d",
         "--destination",
@@ -145,16 +149,14 @@ def create_worldclim_command(cli):
     def create_monthly_item_command(destination: str, cog: str):
         """Creates a STAC Item
         Args:
-            destination (str): An HREF for the STAC Collection
+            destination (str): Output directory
             cog (str): HREF to the Asset COG
         """
-        # modify cog string to readhref to pass into cog below
 
-        item = stac.create_monthly_item(destination, cog)
-        item.set_self_href(
-            os.path.join(destination,
-                         os.path.basename(cog).replace(".tif", ".json")))
-        item.save_object()
+        item = stac.create_monthly_item(cog)
+        item.save_object(dest_href=os.path.join(
+            destination,
+            os.path.basename(cog).replace(".tif", ".json")))
         item.validate()
 
         return None
@@ -181,7 +183,10 @@ def create_worldclim_command(cli):
             destination (str): An HREF for the STAC Collection
             cog (str): HREF to the Asset COG
         """
-        item = stac.create_bioclim_item(destination, cog)
+        item = stac.create_bioclim_item(cog)
+        item.save_object(dest_href=os.path.join(
+            destination,
+            os.path.basename(cog).replace(".tif", ".json")))
         item.save_object()
         item.validate()
 
@@ -189,7 +194,8 @@ def create_worldclim_command(cli):
 
     @worldclim.command(
         "create-full-monthly-collection",
-        short_help="Get all data files and create Items and Collection")
+        short_help="Get all data files and create Items and Collection",
+    )
     @click.option(
         "-d",
         "--destination",
@@ -201,23 +207,31 @@ def create_worldclim_command(cli):
         Args:
             destination (str): An HREF for the STAC Collection
         """
-
-        cog.download_convert_monthly_dataset(destination)
-        for file_name in glob(f"{destination}/*.tif"):
-            print(file_name)
-            item = stac.create_monthly_item(destination, file_name)
-            print(item.self_href)
-            item.save_object()
-            item.validate()
+        os.chdir(destination)
         collection = stac.create_monthly_collection()
-        collection.set_self_href(os.path.join(destination, "collection.json"))
-        collection.normalize_hrefs(destination)
-        collection.save_object()
+        collection.normalize_hrefs("./")
+        collection.save(dest_href="./")
+        cog.download_convert_monthly_dataset("./")
+        for file_name in glob("./*tmin*.tif"):
+            logger.info(f"Processing {file_name}")
+            id = stac.create_monthly_item(file_name).id
+            os.makedirs(id, exist_ok=True)
+            for data_var in MONTHLY_DATA_VARIABLES.keys():
+                var_file_name = file_name.replace("tmin", data_var)
+                shutil.move(var_file_name, os.path.join(id, var_file_name))
+            item = stac.create_monthly_item(os.path.join(id, file_name))
+            collection.add_item(item)
+            item.validate()
+        logger.info("Saving collection")
+        collection.normalize_hrefs("./")
+        collection.make_all_asset_hrefs_relative()
+        collection.save(dest_href="./")
         collection.validate()
 
     @worldclim.command(
         "create-full-bioclim-collection",
-        short_help="Get all data files and create Items and Collection")
+        short_help="Get all data files and create Items and Collection",
+    )
     @click.option(
         "-d",
         "--destination",
@@ -229,18 +243,25 @@ def create_worldclim_command(cli):
         Args:
             destination (str): An HREF for the STAC Collection
         """
-
-        cog.download_convert_bioclim_dataset(destination)
-        for file_name in glob(f"{destination}/*.tif"):
-            print(file_name)
-            item = stac.create_bioclim_item(destination, file_name)
-            print(item.self_href)
-            item.save_object()
-            item.validate()
+        os.chdir(destination)
         collection = stac.create_bioclim_collection()
-        collection.set_self_href(os.path.join(destination, "collection.json"))
-        collection.normalize_hrefs(destination)
-        collection.save_object()
+        collection.normalize_hrefs("./")
+        collection.save(dest_href="./")
+        cog.download_convert_bioclim_dataset("./")
+        for file_name in glob("./*.tif"):
+            logger.info(f"Processing {file_name}")
+            id = os.path.basename(file_name).replace(".tif", "")
+            item_dir = id
+            os.makedirs(item_dir, exist_ok=True)
+            new_file_name = os.path.join(item_dir, f"{id}.tif")
+            shutil.move(file_name, new_file_name)
+            item = stac.create_bioclim_item(new_file_name)
+            collection.add_item(item)
+            item.validate()
+        logger.info("Saving collection")
+        collection.normalize_hrefs("./")
+        collection.make_all_asset_hrefs_relative()
+        collection.save(dest_href="./")
         collection.validate()
 
     return worldclim

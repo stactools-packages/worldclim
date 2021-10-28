@@ -66,16 +66,16 @@ def create_monthly_collection() -> Collection:
 
     bbox = [-180., 90., 180., -90.]
 
-    collection = Collection(id=WORLDCLIM_ID,
-                            title=WORLDCLIM_TITLE,
-                            description=DESCRIPTION,
-                            providers=[WORLDCLIM_PROVIDER],
-                            license=LICENSE,
-                            extent=Extent(
-                                SpatialExtent([bbox]),
-                                TemporalExtent([[start_datetime,
-                                                 end_datetime]])),
-                            catalog_type=CatalogType.RELATIVE_PUBLISHED)
+    collection = Collection(
+        id=WORLDCLIM_ID,
+        title=WORLDCLIM_TITLE,
+        description=DESCRIPTION,
+        providers=[WORLDCLIM_PROVIDER],
+        license=LICENSE,
+        extent=Extent(SpatialExtent([bbox]),
+                      TemporalExtent([[start_datetime, end_datetime]])),
+        catalog_type=CatalogType.RELATIVE_PUBLISHED,
+    )
 
     collection.add_link(LICENSE_LINK)
 
