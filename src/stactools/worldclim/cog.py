@@ -25,6 +25,7 @@ def download_convert_monthly_dataset(output_path: str) -> None:
 
 
 def download_monthly_dataset(output_path: str) -> None:
+    logger.info("Download monthly dataset")
     for res in Resolution:
         res_path = os.path.join(output_path, res.value)
         os.mkdir(res_path)
@@ -34,9 +35,11 @@ def download_monthly_dataset(output_path: str) -> None:
             url = DATASET_URL_TEMPLATE.format(resolution=res.value, variable=v)
             # The following shouldn't blow out the memory when loading large files
             with TemporaryDirectory() as tmp_dir:
-                tmp_file = os.path.join(tmp_dir, "{res}_{v.value}.zip")
+                tmp_file = os.path.join(tmp_dir, f"{res.value}_{v}.zip")
+                logger.info(f"Downloading {url}")
                 urlretrieve(url, tmp_file)
                 with ZipFile(tmp_file) as zipfile:
+                    logger.info(f"Unzipping {tmp_file}")
                     zipfile.extractall(path=var_path)
 
 
@@ -57,15 +60,18 @@ def download_convert_bioclim_dataset(output_path: str) -> None:
 
 
 def download_bioclim_dataset(output_path: str) -> None:
+    logger.info("Downloading bioclimatic dataset")
     for res in Resolution:
         res_path = os.path.join(output_path, res.value)
         os.mkdir(res_path)
         url = DATASET_URL_TEMPLATE.format(resolution=res.value, variable="bio")
         # The following shouldn't blow out the memory when loading large files
         with TemporaryDirectory() as tmp_dir:
-            tmp_file = os.path.join(tmp_dir, "{res}_bio.zip")
+            tmp_file = os.path.join(tmp_dir, f"{res}_bio.zip")
+            logger.info(f"Downloading {url}")
             urlretrieve(url, tmp_file)
             with ZipFile(tmp_file) as zipfile:
+                logger.info(f"Unzipping {tmp_file}")
                 zipfile.extractall(path=res_path)
 
 
@@ -95,6 +101,7 @@ def create_tiled_cogs(
     Returns:
         None
     """
+    logger.info(f"Retiling {input_file}")
     try:
         with TemporaryDirectory() as tmp_dir:
             cmd = [
@@ -152,7 +159,7 @@ def create_cog(
     Returns:
         None
     """
-
+    logger.info(f"Converting {input_path} to COG")
     output = None
     try:
         if dry_run:
