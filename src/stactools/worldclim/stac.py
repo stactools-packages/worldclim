@@ -372,7 +372,7 @@ def create_bioclim_item(
         roles=["data"],
         href=cog_href,
     )
-    item.add_asset(bio_var, cog_asset)
+    item.add_asset("data", cog_asset)
 
     # Include projection information on Asset
     cog_asset_proj = ProjectionExtension.ext(cog_asset, add_if_missing=True)
