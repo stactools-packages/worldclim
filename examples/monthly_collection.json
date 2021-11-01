@@ -1,0 +1,131 @@
+{
+  "type": "Collection",
+  "id": "worldclim-monthly",
+  "stac_version": "1.0.0",
+  "description": "This is WorldClim version 2.1 climate data for 1970-2000. This version was\nreleased in January 2020. There are monthly climate data for minimum, mean, and maximum temperature,\nprecipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There\nare also 19 “bioclimatic” variables. The data is available at the four spatial resolutions, between\n30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a “zip” file containing 12 GeoTiff\n(.tif) files, one for each month of the year (January is 1; December is 12).",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "title": "Creative Commons - Attribution-ShareAlike 4.0 International - CC BY-SA 4.0"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.1002/joc.5086"
+    },
+    {
+      "rel": "self",
+      "href": "/Users/cpapalaz/Documents/worldclim/examples/collection.json",
+      "type": "application/json"
+    }
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/version/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
+  ],
+  "version": "2.1",
+  "sci:doi": "10.1002/joc.5086",
+  "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+  "item_assets": {
+    "tmin": {
+      "title": "tmin",
+      "description": "Minimum Temperature (degrees C)",
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    },
+    "tmax": {
+      "title": "tmax",
+      "description": "Maximum Temperature (degrees C)",
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    },
+    "tavg": {
+      "title": "tavg",
+      "description": "Average Temperature (degrees C)",
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    },
+    "prec": {
+      "title": "prec",
+      "description": "Precipitation (mm)",
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    },
+    "srad": {
+      "title": "srad",
+      "description": "Solar Radiation (kJ m-2 day-1)",
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    },
+    "wind": {
+      "title": "wind",
+      "description": "Wind Speed (m s-1)",
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    },
+    "vapr": {
+      "title": "vapr",
+      "description": "Water Vapor Pressure (kPa)",
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "title": "WorldClim historical climate data by month",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -180.0,
+          90.0,
+          180.0,
+          -90.0
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "1970-01-01T00:00:00Z",
+          "2000-12-31T23:59:59Z"
+        ]
+      ]
+    }
+  },
+  "license": "CC-BY-SA-4.0",
+  "providers": [
+    {
+      "name": "WorldClim",
+      "roles": [
+        "processor",
+        "host"
+      ],
+      "url": "https://worldclim.org/data/worldclim21.html"
+    }
+  ],
+  "summaries": {
+    "proj:epsg": [
+      4326
+    ]
+  }
+}

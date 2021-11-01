@@ -1,0 +1,81 @@
+{
+  "type": "Collection",
+  "id": "worldclim-bioclim",
+  "stac_version": "1.0.0",
+  "description": "Bioclimatic variables are derived from the monthly temperature\nand rainfall values in order to generate more biologically meaningful variables. These are\noften used in species distribution modeling and related ecological modeling techniques.\nThe bioclimatic variables represent annual trends (e.g., mean annual temperature, annual\nprecipitation) seasonality (e.g., annual range in temperature and precipitation) and extreme\nor limiting environmental factors (e.g., temperature of the coldest and warmest month, and\nprecipitation of the wet and dry quarters). A quarter is a period of three months\n(1/4 of the year).",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "title": "Creative Commons - Attribution-ShareAlike 4.0 International - CC BY-SA 4.0"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.1002/joc.5086"
+    },
+    {
+      "rel": "self",
+      "href": "/Users/cpapalaz/Documents/worldclim/examples/collection.json",
+      "type": "application/json"
+    }
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/version/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
+  ],
+  "version": "2.1",
+  "sci:doi": "10.1002/joc.5086",
+  "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+  "item_assets": {
+    "data": {
+      "type": "image/tiff",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "title": "WorldClim historical bioclimatic variables",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -180.0,
+          90.0,
+          180.0,
+          -90.0
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "1970-01-01T00:00:00Z",
+          "2000-12-31T23:59:59Z"
+        ]
+      ]
+    }
+  },
+  "license": "CC-BY-SA-4.0",
+  "providers": [
+    {
+      "name": "WorldClim",
+      "roles": [
+        "processor",
+        "host"
+      ],
+      "url": "https://worldclim.org/data/worldclim21.html"
+    }
+  ],
+  "summaries": {
+    "proj:epsg": [
+      4326
+    ]
+  }
+}
