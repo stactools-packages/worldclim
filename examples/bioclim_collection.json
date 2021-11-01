@@ -20,7 +20,7 @@
     },
     {
       "rel": "self",
-      "href": "/Users/cpapalaz/Documents/worldclim/bioclim_collection/collection.json",
+      "href": "/Users/cpapalaz/Documents/worldclim/examples/collection.json",
       "type": "application/json"
     }
   ],

@@ -13,4 +13,5 @@ def register_plugin(registry):
 
 __all__ = [create_cog.__name__, create_monthly_item.__name__]
 
-__version__ = '0.1.0'
+__version__ = '0.1.5'
+"""Library version"""

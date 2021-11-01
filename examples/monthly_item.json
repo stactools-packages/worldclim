@@ -1,62 +1,62 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "id": "wc2.1_30s_7_1_2",
+  "id": "wc2.1_10m_1",
   "properties": {
-    "title": "Worldclim 30s July",
-    "description": "This is WorldClim version 2.1 climate data for 1970-2000. This version was\nreleased in January 2020. There are monthly climate data for minimum, mean, and maximum temperature,\nprecipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There\nare also 19 \u201cbioclimatic\u201d variables. The data is available at the four spatial resolutions, between\n30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a \u201czip\u201d file containing 12 GeoTiff\n(.tif) files, one for each month of the year (January is 1; December is 12).",
-    "start_datetime": "1970-07-01T00:00:00Z",
-    "end_datetime": "2000-07-31T23:59:59Z",
+    "title": "Worldclim 10m January",
+    "description": "This is WorldClim version 2.1 climate data for 1970-2000. This version was\nreleased in January 2020. There are monthly climate data for minimum, mean, and maximum temperature,\nprecipitation, solar radiation, wind speed, water vapor pressure, and for total precipitation. There\nare also 19 “bioclimatic” variables. The data is available at the four spatial resolutions, between\n30 seconds (~1 km2) to 10 minutes (~340 km2). Each download is a “zip” file containing 12 GeoTiff\n(.tif) files, one for each month of the year (January is 1; December is 12).",
+    "start_datetime": "1970-01-01T00:00:00Z",
+    "end_datetime": "2000-01-31T23:59:59Z",
     "proj:epsg": 4326,
     "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
     "proj:bbox": [
+      -180.0,
       -90.0,
-      0.0,
-      0.0,
+      180.0,
       90.0
     ],
     "proj:transform": [
-      0.008333333333333333,
+      0.16666666666666666,
       0.0,
-      -90.0,
+      -180.0,
       0.0,
-      -0.008333333333333333,
+      -0.16666666666666666,
       90.0,
       0.0,
       0.0,
       1.0
     ],
     "proj:shape": [
-      10800,
-      10800
+      1080,
+      2160
     ],
     "sci:doi": "10.1002/joc.5086",
     "sci:citation": "Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
-    "datetime": "1970-07-01T00:00:00Z"
+    "datetime": "1970-01-01T00:00:00Z"
   },
   "geometry": {
     "type": "Polygon",
     "coordinates": [
       [
         [
-          0.0,
-          0.0
+          180.0,
+          -90.0
         ],
         [
-          0.0,
+          180.0,
           90.0
         ],
         [
-          -90.0,
+          -180.0,
           90.0
         ],
         [
-          -90.0,
-          0.0
+          -180.0,
+          -90.0
         ],
         [
-          0.0,
-          0.0
+          180.0,
+          -90.0
         ]
       ]
     ]
@@ -65,233 +65,228 @@
     {
       "rel": "cite-as",
       "href": "https://doi.org/10.1002/joc.5086"
-    },
-    {
-      "rel": "self",
-      "href": "/Users/cpapalaz/Documents/worldclim/monthly_item/wc2.1_30s_tavg_07_1_2.json",
-      "type": "application/json"
     }
   ],
   "assets": {
     "tmin": {
-      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_07_1_2.tif",
+      "href": "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_tmin_01.tif",
       "type": "image/tiff",
       "title": "tmin",
       "description": "Minimum Temperature (degrees C)",
       "proj:epsg": 4326,
       "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
       "proj:transform": [
-        0.008333333333333333,
+        0.16666666666666666,
         0.0,
-        -90.0,
+        -180.0,
         0.0,
-        -0.008333333333333333,
+        -0.16666666666666666,
         90.0,
         0.0,
         0.0,
         1.0
       ],
       "proj:bbox": [
+        -180.0,
         -90.0,
-        0.0,
-        0.0,
+        180.0,
         90.0
       ],
       "proj:shape": [
-        10800,
-        10800
+        1080,
+        2160
       ],
       "roles": [
         "data"
       ]
     },
     "tmax": {
-      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_07_1_2.tif",
+      "href": "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_tmax_01.tif",
       "type": "image/tiff",
       "title": "tmax",
       "description": "Maximum Temperature (degrees C)",
       "proj:epsg": 4326,
       "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
       "proj:transform": [
-        0.008333333333333333,
+        0.16666666666666666,
         0.0,
-        -90.0,
+        -180.0,
         0.0,
-        -0.008333333333333333,
+        -0.16666666666666666,
         90.0,
         0.0,
         0.0,
         1.0
       ],
       "proj:bbox": [
+        -180.0,
         -90.0,
-        0.0,
-        0.0,
+        180.0,
         90.0
       ],
       "proj:shape": [
-        10800,
-        10800
+        1080,
+        2160
       ],
       "roles": [
         "data"
       ]
     },
     "tavg": {
-      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_07_1_2.tif",
+      "href": "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_tavg_01.tif",
       "type": "image/tiff",
       "title": "tavg",
       "description": "Average Temperature (degrees C)",
       "proj:epsg": 4326,
       "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
       "proj:transform": [
-        0.008333333333333333,
+        0.16666666666666666,
         0.0,
-        -90.0,
+        -180.0,
         0.0,
-        -0.008333333333333333,
+        -0.16666666666666666,
         90.0,
         0.0,
         0.0,
         1.0
       ],
       "proj:bbox": [
+        -180.0,
         -90.0,
-        0.0,
-        0.0,
+        180.0,
         90.0
       ],
       "proj:shape": [
-        10800,
-        10800
+        1080,
+        2160
       ],
       "roles": [
         "data"
       ]
     },
     "prec": {
-      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_07_1_2.tif",
+      "href": "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_prec_01.tif",
       "type": "image/tiff",
       "title": "prec",
       "description": "Precipitation (mm)",
       "proj:epsg": 4326,
       "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
       "proj:transform": [
-        0.008333333333333333,
+        0.16666666666666666,
         0.0,
-        -90.0,
+        -180.0,
         0.0,
-        -0.008333333333333333,
+        -0.16666666666666666,
         90.0,
         0.0,
         0.0,
         1.0
       ],
       "proj:bbox": [
+        -180.0,
         -90.0,
-        0.0,
-        0.0,
+        180.0,
         90.0
       ],
       "proj:shape": [
-        10800,
-        10800
+        1080,
+        2160
       ],
       "roles": [
         "data"
       ]
     },
     "srad": {
-      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_07_1_2.tif",
+      "href": "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_srad_01.tif",
       "type": "image/tiff",
       "title": "srad",
       "description": "Solar Radiation (kJ m-2 day-1)",
       "proj:epsg": 4326,
       "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
       "proj:transform": [
-        0.008333333333333333,
+        0.16666666666666666,
         0.0,
-        -90.0,
+        -180.0,
         0.0,
-        -0.008333333333333333,
+        -0.16666666666666666,
         90.0,
         0.0,
         0.0,
         1.0
       ],
       "proj:bbox": [
+        -180.0,
         -90.0,
-        0.0,
-        0.0,
+        180.0,
         90.0
       ],
       "proj:shape": [
-        10800,
-        10800
+        1080,
+        2160
       ],
       "roles": [
         "data"
       ]
     },
     "wind": {
-      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_07_1_2.tif",
+      "href": "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_wind_01.tif",
       "type": "image/tiff",
       "title": "wind",
       "description": "Wind Speed (m s-1)",
       "proj:epsg": 4326,
       "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
       "proj:transform": [
-        0.008333333333333333,
+        0.16666666666666666,
         0.0,
-        -90.0,
+        -180.0,
         0.0,
-        -0.008333333333333333,
+        -0.16666666666666666,
         90.0,
         0.0,
         0.0,
         1.0
       ],
       "proj:bbox": [
+        -180.0,
         -90.0,
-        0.0,
-        0.0,
+        180.0,
         90.0
       ],
       "proj:shape": [
-        10800,
-        10800
+        1080,
+        2160
       ],
       "roles": [
         "data"
       ]
     },
     "vapr": {
-      "href": "/Users/cpapalaz/Documents/climate_data/01/wc2.1_30s_tavg_07_1_2.tif",
+      "href": "/Users/cpapalaz/Documents/worldclim/tests/data-files/wc2.1_10m_vapr_01.tif",
       "type": "image/tiff",
       "title": "vapr",
       "description": "Water Vapor Pressure (kPa)",
       "proj:epsg": 4326,
       "proj:wkt2": "GEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],CS[ellipsoidal,2],AXIS[\"geodetic latitude (Lat)\",north,ORDER[1],ANGLEUNIT[\"degree\",0.0174532925199433]],AXIS[\"geodetic longitude (Lon)\",east,ORDER[2],ANGLEUNIT[\"degree\",0.0174532925199433]],USAGE[SCOPE[\"Horizontal component of 3D system.\"],AREA[\"World.\"],BBOX[-90,-180,90,180]],ID[\"EPSG\",4326]]",
       "proj:transform": [
-        0.008333333333333333,
+        0.16666666666666666,
         0.0,
-        -90.0,
+        -180.0,
         0.0,
-        -0.008333333333333333,
+        -0.16666666666666666,
         90.0,
         0.0,
         0.0,
         1.0
       ],
       "proj:bbox": [
+        -180.0,
         -90.0,
-        0.0,
-        0.0,
+        180.0,
         90.0
       ],
       "proj:shape": [
-        10800,
-        10800
+        1080,
+        2160
       ],
       "roles": [
         "data"
@@ -299,9 +294,9 @@
     }
   },
   "bbox": [
+    -180.0,
     -90.0,
-    0.0,
-    0.0,
+    180.0,
     90.0
   ],
   "stac_extensions": [
