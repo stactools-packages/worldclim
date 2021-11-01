@@ -21,9 +21,9 @@ Weather station data from between 9000 and 60 000 weather stations were interp
 
 ```bash
 # Create a COG - creates /path/to/local_cog.tif
-stac worldclim create-cog -d "/path/to/directory" -s "/path/to/local.tif"
+stac worldclim create-cog -d "/path/to/directory" -c "/path/to/local.tif"
 # Create a STAC Item - creates /path/to/directory/local_cog.json
-stac worldclim create-item -d "/path/to/directory" -c "/path/to/local_cog.tif" -e "/path/to/extent.geojson"
+stac worldclim create-item -d "/path/to/directory" -c "/path/to/local_cog.tif"
 # Create a STAC Collection
 stac worldclim create-collection -d "/path/to/directory"
 ```
